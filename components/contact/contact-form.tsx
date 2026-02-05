@@ -1,9 +1,7 @@
 "use client"
 
-import React from "react"
-
-import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import React, { useState }  from "react"
+import { ChevronDown, Loader2 } from "lucide-react"
 
 const industryOptions = [
   "Shopping Mall / Retail",
@@ -17,10 +15,37 @@ const industryOptions = [
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setSubmitted(true)
+    setLoading(true)
+    setError("")
+
+    const formData = new FormData(e.currentTarget)
+    const data = Object.fromEntries(formData.entries()) // "dict"
+
+    try {
+      const response = await fetch("/api/send", {
+        method: "POST",
+        headers: {
+          "Content-type" : "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to send message.")
+      }
+
+      setSubmitted(true)
+    } catch (err) {
+      console.error(err)
+      setError("Something went wrong. Please try again or email us directly.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) {
@@ -61,6 +86,7 @@ export function ContactForm() {
             className="w-full bg-[#f5f5f5]/50 border border-[#cccccc] text-[#333333] text-sm rounded-lg focus:ring-2 focus:ring-[#0072FF] focus:border-[#0072FF] block p-3 transition-all outline-none placeholder-[#cccccc]"
             placeholder="Jane Doe"
             required
+            disabled={loading}
           />
         </div>
 
@@ -77,6 +103,7 @@ export function ContactForm() {
               className="w-full bg-[#f5f5f5]/50 border border-[#cccccc] text-[#333333] text-sm rounded-lg focus:ring-2 focus:ring-[#0072FF] focus:border-[#0072FF] block p-3 transition-all outline-none placeholder-[#cccccc]"
               placeholder="Acme Inc."
               required
+              disabled={loading}
             />
           </div>
           <div>
@@ -90,6 +117,7 @@ export function ContactForm() {
               className="w-full bg-[#f5f5f5]/50 border border-[#cccccc] text-[#333333] text-sm rounded-lg focus:ring-2 focus:ring-[#0072FF] focus:border-[#0072FF] block p-3 transition-all outline-none placeholder-[#cccccc]"
               placeholder="+1 (555) 000-0000"
               required
+              disabled={loading}
             />
           </div>
         </div>
@@ -106,6 +134,7 @@ export function ContactForm() {
             className="w-full bg-[#f5f5f5]/50 border border-[#cccccc] text-[#333333] text-sm rounded-lg focus:ring-2 focus:ring-[#0072FF] focus:border-[#0072FF] block p-3 transition-all outline-none placeholder-[#cccccc]"
             placeholder="jane@company.com"
             required
+            disabled={loading}
           />
         </div>
 
@@ -120,6 +149,7 @@ export function ContactForm() {
               name="industry"
               className="w-full bg-[#f5f5f5]/50 border border-[#cccccc] text-[#333333] text-sm rounded-lg focus:ring-2 focus:ring-[#0072FF] focus:border-[#0072FF] block p-3 appearance-none transition-all outline-none"
               required
+              disabled={loading}
             >
               <option value="">Select your industry</option>
               {industryOptions.map((option) => (
@@ -143,17 +173,24 @@ export function ContactForm() {
             rows={4}
             className="w-full bg-[#f5f5f5]/50 border border-[#cccccc] text-[#333333] text-sm rounded-lg focus:ring-2 focus:ring-[#0072FF] focus:border-[#0072FF] block p-3 transition-all outline-none placeholder-[#cccccc] resize-none"
             placeholder="Describe your facility, current challenges, or specific features you're interested in..."
+            disabled={loading}
           />
         </div>
+        
+        {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+        )}
 
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full text-white bg-[#0072FF] hover:bg-[#003699] focus:ring-4 focus:outline-none focus:ring-[#e1ffff] font-semibold rounded-full text-base px-8 py-4 text-center transition-all shadow-lg shadow-[#0072FF]/30"
+          disabled={loading}
+          className="w-full text-white bg-[#0072FF] hover:bg-[#003699] focus:ring-4 focus:outline-none focus:ring-[#e1ffff] font-semibold rounded-full text-base px-8 py-4 text-center transition-all shadow-lg shadow-[#0072FF]/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          Request Demo
+          {loading && <Loader2 className="animate-spin w-4 h-4" />}
+          {loading ? "Sending..." : "Request Demo"}
         </button>
-
+        
         <p className="text-xs text-center text-[#5c5c5c] mt-4">
           By submitting, you agree to our{" "}
           <span className="underline cursor-not-allowed">Privacy Policy</span>.

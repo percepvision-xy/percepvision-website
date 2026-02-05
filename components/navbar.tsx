@@ -50,10 +50,11 @@ export function Navbar() {
           </button>
           <button
             type="button"
-            className="text-white bg-[#0072FF] hover:bg-[#003699] focus:ring-4 focus:outline-none focus:ring-[#e1ffff] font-medium rounded-full text-sm px-6 py-2.5 text-center transition-all shadow-lg shadow-[#0072FF]/30 cursor-not-allowed opacity-50"
-            disabled
+            className="text-white bg-[#0072FF] hover:bg-[#003699] focus:outline-none font-medium rounded-full text-sm px-6 py-2.5 text-center transition-all shadow-lg shadow-[#0072FF]/30"
           >
-            Get Started
+            <Link href="/contact">
+              Get Started
+            </Link>
           </button>
           <button
             type="button"
