@@ -2,9 +2,13 @@
 import { NextResponse } from "next/server";
 import { Resend } from 'resend';
 
-const RESEND = new Resend(process.env.RESEND_API_KEY)
+const RESEND = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: Request) {
+    if (!RESEND) {
+        return new Response(JSON.stringify({ "error" : "API key not properly configured."}))
+    }
+    
     try {
         const body = await request.json()
         const { fullname , company, phone, email, industry, message } = body
