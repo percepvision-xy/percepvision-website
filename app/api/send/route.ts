@@ -2,10 +2,10 @@
 import { NextResponse } from "next/server";
 import { Resend } from 'resend';
 
-const RESEND = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: Request) {
-    if (!RESEND) {
+    if (!resend) {
         return new Response(JSON.stringify({ "error" : "API key not properly configured."}))
     }
     
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         const body = await request.json()
         const { fullname , company, phone, email, industry, message } = body
 
-        const data = await RESEND.emails.send({
+        const data = await resend.emails.send({
             from: 'Percepvision Website <noreply@percepvision.com>',
             to: ['info@percepvision.com'],
             replyTo: email,
