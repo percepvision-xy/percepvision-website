@@ -3,15 +3,15 @@ import { Star } from "lucide-react"
 const testimonials = [
   {
     quote:
-      "Percepvision transformed how we manage security at our logistics hubs. The automated incident analysis saves our team hours every single day.",
-    author: "Sarah Jenkins",
-    role: "Head of Operations, MetroLogistics",
+      "The advanced analytics are fundamental to our security protocols. Intrusion detection, loitering detection, and unattended obiect detection provide crucial proactive monitoring capabilities instantly alerting our teams before activity can escalate. The platform has elevated our operational planning, asset value, and public safety standards.",
+    author: "Kuldeep Kainth",
+    role: "Director of Innovative Solutions, CIS Security",
   },
   {
     quote:
-      "The real-time threat detection is incredibly fast. We moved from reactive to proactive security within weeks of installation.",
-    author: "David Chen",
-    role: "CTO, Skyline Properties",
+      "PercepVision delivers a scalable, state-of-the-art Al video analytics platform engineered for reliability, performance, and seamless deployment across large-scale environments.",
+    author: "Robert Yang",
+    role: "PercepVision AI",
   },
 ]
 

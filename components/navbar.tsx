@@ -43,7 +43,7 @@ export function Navbar() {
         <div className="flex md:order-2 space-x-3 md:space-x-4">
           <button
             type="button"
-            className="text-[#5c5c5c] hover:text-[#0072FF] font-medium rounded-lg text-sm px-4 py-2 text-center transition-colors cursor-not-allowed opacity-50"
+            className={`text-[#5c5c5c] hover:text-[#0072FF] font-medium rounded-lg text-sm px-4 py-2 text-center transition-colors cursor-not-allowed opacity-50 hidden sm:block`}
             disabled
           >
             Log in
@@ -51,7 +51,7 @@ export function Navbar() {
           <Link href="/contact">
             <button
               type="button"
-              className="text-white bg-[#0072FF] hover:bg-[#003699] focus:outline-none font-medium rounded-full text-sm px-6 py-2.5 text-center transition-all shadow-lg shadow-[#0072FF]/30"
+              className="text-white bg-[#0072FF] hover:bg-[#003699] cursor-pointer focus:outline-none font-medium rounded-full text-sm px-6 py-2.5 text-center transition-all shadow-lg shadow-[#0072FF]/30"
             >
               Get Started
             </button>
@@ -93,6 +93,15 @@ export function Navbar() {
                 )}
               </li>
             ))}
+            <li>
+              <button
+                type="button"
+                className={`block py-2 px-3 text-[#5c5c5c]/50 cursor-not-allowed rounded md:p-0 sm:hidden`}
+                disabled={true}
+              >
+                Log In
+              </button>
+            </li>
           </ul>
         </div>
       </div>
