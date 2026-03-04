@@ -2,6 +2,7 @@
 
 import React, { useState }  from "react"
 import { ChevronDown, Loader2 } from "lucide-react"
+import { sendGAEvent } from "@next/third-parties/google";
 
 const industryOptions = [
   "Shopping Mall / Retail",
@@ -187,6 +188,11 @@ export function ContactForm() {
             type="submit"
             disabled={loading}
             className="w-full text-white bg-[#0072FF] hover:bg-[#003699] focus:ring-4 focus:outline-none focus:ring-[#e1ffff] font-semibold rounded-full text-base px-8 py-4 text-center transition-all shadow-lg shadow-[#0072FF]/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            onClick={
+              () => {
+                sendGAEvent('event', 'demo_form_submitted', { value: 'testing' })
+              }
+            }
           >
             {loading && <Loader2 className="animate-spin w-4 h-4" />}
             {loading ? "Sending..." : "Request Demo"}

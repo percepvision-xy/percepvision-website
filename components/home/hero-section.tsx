@@ -1,5 +1,8 @@
+'use client';
+
 import Link from "next/link"
 import { ArrowRight, PlayCircle } from "lucide-react"
+import { sendGAEvent } from "@next/third-parties/google";
 
 export function HeroSection() {
   return (
@@ -17,7 +20,7 @@ export function HeroSection() {
         </div>
         <h1 className="md:text-7xl leading-tight text-5xl font-semibold text-[#333333] tracking-tight max-w-4xl mx-auto mb-6">
           AI-Powered Smart Safety <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#0072FF] to-[#003699]">
+          <span className="bg-clip-text text-transparent bg-linear-to-r from-[#0072FF] to-[#003699]">
             & Video Analytics
           </span>
         </h1>
@@ -27,7 +30,11 @@ export function HeroSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/contact"
-            className="w-full sm:w-auto px-8 py-4 bg-[#333333] text-white font-medium rounded-full hover:bg-[#5c5c5c] transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-4 bg-[#333333] text-white font-medium rounded-full hover:bg-[#5c5c5c] transition-colors flex items-center justify-center gap-2" onClick={
+              () => {
+                sendGAEvent('event', 'demo_form_viewed', { value: 'testing' })
+              }
+            }
           >
             Request Demo <ArrowRight className="w-4 h-4" />
           </Link>
