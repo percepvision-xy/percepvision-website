@@ -22,7 +22,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="leading-relaxed text-sm font-light text-[#5c5c5c] max-w-sm mb-6">
-              Intelligent security solutions for the modern enterprise. Powered by advanced AI, designed for humans.
+              Intelligent security solutions for the modern enterprise. Powered by advanced AI, designed for human use.
             </p>
             <div className="flex gap-4 items-center">
               <a
