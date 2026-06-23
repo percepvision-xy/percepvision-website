@@ -114,9 +114,9 @@ function BulletList({ items }: { items: string[] }) {
   )
 }
 
-function PolicySection({ title, children }: { title: string; children: ReactNode }) {
+function PolicySection({ title, children, isFirst = false }: { title: string; children: ReactNode; isFirst?: boolean }) {
   return (
-    <section className="border-t border-[#e5e5e5] pt-10">
+    <section className={isFirst ? "pt-0" : "border-t border-[#e5e5e5] pt-10"}>
       <h2 className="mb-5 text-2xl font-semibold tracking-tight text-[#333333] md:text-3xl">{title}</h2>
       <div className="space-y-5 leading-relaxed text-[#5c5c5c]">{children}</div>
     </section>
@@ -173,7 +173,7 @@ export default function PrivacyPolicyPage() {
 
         <article className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           <div className="space-y-12 text-lg">
-            <PolicySection title="Introduction">
+            <PolicySection title="Introduction" isFirst>
               <p>
                 PercepVision AI Limited (“PercepVision”, “we”, “our”, or “us”) is committed to protecting your privacy
                 and handling personal information responsibly.

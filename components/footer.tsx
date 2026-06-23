@@ -66,9 +66,9 @@ export function Footer() {
                   Features
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <span className="text-[#5c5c5c]/50 cursor-not-allowed block">Hardware</span>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -81,7 +81,7 @@ export function Footer() {
                   Mixed-Use
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <span className="text-[#5c5c5c]/50 cursor-not-allowed block">Stadiums</span>
               </li>
               <li>
@@ -89,7 +89,7 @@ export function Footer() {
               </li>
               <li>
                 <span className="text-[#5c5c5c]/50 cursor-not-allowed block">Transportation</span>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -114,12 +114,12 @@ export function Footer() {
           <div>
             <h4 className="font-medium text-[#333333] mb-4 text-sm">Company</h4>
             <ul className="space-y-3 text-sm text-[#5c5c5c]">
-              <li>
+              {/* <li>
                 <span className="text-[#5c5c5c]/50 cursor-not-allowed block">About Us</span>
               </li>
               <li>
                 <span className="text-[#5c5c5c]/50 cursor-not-allowed block">Careers</span>
-              </li>
+              </li> */}
               <li>
                 <Link href="/contact" className="hover:text-[#0072FF] transition-colors block">
                   Contact
@@ -138,7 +138,9 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <span className="text-[#5c5c5c]/50 cursor-not-allowed block">Terms of Service</span>
+                <Link href="/terms-of-use" className="hover:text-[#0072FF] transition-colors block">
+                  Terms of Use
+                </Link>
               </li>
             </ul>
           </div>
