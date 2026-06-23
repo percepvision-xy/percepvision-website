@@ -186,7 +186,11 @@ export default function BlogPage() {
             </button>
           </form>
           <p className="mt-4 text-xs text-[#5c5c5c]">
-            We care about your data in our <span className="underline cursor-not-allowed">privacy policy</span>. No spam, ever.
+            We care about your data in our{" "}
+            <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-[#0072FF] transition-colors">
+              privacy policy
+            </Link>
+            . No spam, ever.
           </p>
         </div>
       </section>

@@ -133,7 +133,9 @@ export function Footer() {
             <h4 className="font-medium text-[#333333] mb-4 text-sm">Legal</h4>
             <ul className="space-y-3 text-sm text-[#5c5c5c]">
               <li>
-                <span className="text-[#5c5c5c]/50 cursor-not-allowed block">Privacy Policy</span>
+                <Link href="/privacy-policy" className="hover:text-[#0072FF] transition-colors block">
+                  Privacy Policy
+                </Link>
               </li>
               <li>
                 <span className="text-[#5c5c5c]/50 cursor-not-allowed block">Terms of Service</span>

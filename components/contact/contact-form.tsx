@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import React, { useState }  from "react"
 import { ChevronDown, Loader2 } from "lucide-react"
 import { sendGAEvent } from "@next/third-parties/google";
@@ -200,7 +201,10 @@ export function ContactForm() {
           
           <p className="text-xs text-center text-[#5c5c5c] mt-4">
             By submitting, you agree to our{" "}
-            <span className="underline cursor-not-allowed">Privacy Policy</span>.
+            <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-[#0072FF] transition-colors">
+              Privacy Policy
+            </Link>
+            .
           </p>
         </form>
         
