@@ -1,54 +1,71 @@
-import {
-  ScanFace,
-  Users,
-  ShieldAlert,
-  AlertTriangle,
-  Footprints,
-  FileSearch,
-  Flame,
-  Car,
-  BarChartBig,
-  Activity,
-  Package,
-  Crosshair,
-} from "lucide-react"
+import { Camera, Cpu, Move, Scaling, Shield, ShieldCheck } from "lucide-react"
 
-const features = [
-  { icon: ScanFace, title: "Facial Recognition & Access Control" },
-  { icon: Users, title: "Occupancy Management" },
-  { icon: ShieldAlert, title: "Intrusion Detection" },
-  { icon: AlertTriangle, title: "Violence & Threat Detection" },
-  { icon: Footprints, title: "Tailgating Prevention" },
-  { icon: FileSearch, title: "Search and Investigation" },
-  { icon: Flame, title: "Smoke and Fire Detection" },
-  { icon: Car, title: "Car Park Management" },
-  { icon: BarChartBig, title: "Business Intelligence" },
-  { icon: Activity, title: "Slip, Trip and Fall Detection" },
-  { icon: Package, title: "Unattended Object Detection" },
-  { icon: Crosshair, title: "Weapon Detection" },
+const cards = [
+  {
+    icon: Camera,
+    title: "Works with Existing Cameras & VMS",
+    description:
+      "Add AI intelligence to your existing CCTV and VMS infrastructure without replacing your camera estate.",
+  },
+  {
+    icon: Cpu,
+    title: "Edge AI Processing",
+    description:
+      "Process video close to the source for low-latency intelligence while reducing bandwidth and cloud dependency.",
+  },
+  {
+    icon: Move,
+    title: "Flexible Deployment",
+    description: "Deploy on-premises, at the edge or in hybrid environments to meet operational and IT requirements.",
+  },
+  {
+    icon: Scaling,
+    title: "Enterprise Scalability",
+    description:
+      "Scale from individual sites to multi-site deployments with centralised management and intelligence.",
+  },
+  {
+    icon: Shield,
+    title: "Open & Integratable",
+    description:
+      "Connect intelligence with VMS, access control and enterprise systems through APIs and integrations.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Security & Privacy by Design",
+    description:
+      "Protect video and analytics data with secure communications, access controls and privacy-conscious architecture.",
+  },
 ]
 
 export function FeaturesSection() {
   return (
-    <section className="py-24 bg-[#f5f5f5]">
+    <section className="py-24 bg-white border-t border-[#e5e5e5]">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-4xl mx-auto mb-20">
-          <span className="text-[#0072FF] font-semibold tracking-tight uppercase text-sm">Features</span>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-[#333333] mt-2 mb-6">
-            <span className="text-[#0072FF]">AI-driven video analytics</span> features include:
+        <div className="text-center mb-16">
+          <p className="text-blue-700 font-medium tracking-wider uppercase text-sm mb-4">Platform Advantages</p>
+          <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-neutral-900 mb-6 leading-tight">
+            Built for Your Existing Infrastructure.
+            <br className="hidden md:block" />
+            <span className="text-blue-600">Designed for Enterprise Scale.</span>
           </h2>
-          <p className="text-lg text-[#5c5c5c] leading-relaxed max-w-3xl mx-auto">
-            Our AI-driven video analytics platform effortlessly connects with your current CCTV security camera and VMS setups. Experience real-time event alerts and reports that enhance your security, crowd management and business operations.
+          <p className="text-lg md:text-xl text-neutral-600 leading-relaxed max-w-3xl mx-auto">
+            Add enterprise AI intelligence to the cameras and systems you already have — without replacing your existing
+            CCTV infrastructure.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-          {features.map((feature) => (
-            <div key={feature.title} className="flex flex-col items-center text-center group">
-              <div className="w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300">
-                <feature.icon className="w-8 h-8" strokeWidth={1.5} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {cards.map((card) => (
+            <div
+              key={card.title}
+              className="bg-white rounded-[1.5rem] p-8 border border-neutral-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] transition-shadow hover:shadow-md"
+            >
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-6">
+                <card.icon className="w-6 h-6" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold text-[#333333] tracking-tight">{feature.title}</h3>
+              <h3 className="text-xl font-medium text-neutral-900 tracking-tight mb-3">{card.title}</h3>
+              <p className="text-base text-neutral-600 leading-relaxed">{card.description}</p>
             </div>
           ))}
         </div>

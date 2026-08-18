@@ -5,7 +5,6 @@ import { WhyPercepvisionSection } from "@/components/home/why-percepvision-secti
 import { FeaturesSection } from "@/components/home/features-section"
 import { BenefitsSection } from "@/components/home/benefits-section"
 import { HowItWorksSection } from "@/components/home/how-it-works-section"
-import { StatsSection } from "@/components/home/stats-section"
 import { TestimonialsSection } from "@/components/home/testimonials-section"
 import { CTASection } from "@/components/home/cta-section"
 
@@ -19,7 +18,6 @@ export default function HomePage() {
         <FeaturesSection />
         <BenefitsSection />
         <HowItWorksSection />
-        <StatsSection />
         <TestimonialsSection />
         <CTASection />
       </main>
