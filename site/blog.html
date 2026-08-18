@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en"><head><script id="aura-preview-performance-controller">
+(function() {
+if (window.__auraPreviewPerformanceController) return;
+const nativeRequestAnimationFrame = window.requestAnimationFrame
+? window.requestAnimationFrame.bind(window)
+: function(callback) { return window.setTimeout(function() { callback(Date.now()); }, 16); };
+const nativeCancelAnimationFrame = window.cancelAnimationFrame
+? window.cancelAnimationFrame.bind(window)
+: window.clearTimeout.bind(window);
+const nativeSetInterval = window.setInterval.bind(window);
+let paused = false;
+let nextFrameId = 1;
+const frameRecords = new Map();
+const pausedFrameCallbacks = new Map();
+const style = document.createElement('style');
+style.id = 'aura-preview-performance-style';
+style.textContent = [
+'html[data-aura-preview-paused="true"] *,',
+'html[data-aura-preview-paused="true"] *::before,',
+'html[data-aura-preview-paused="true"] *::after {',
+'  animation-play-state: paused !important;',
+'  transition-duration: 0s !important;',
+'  scroll-behavior: auto !important;',
+'}'
+].join('\n');
+document.head.appendChild(style);
+window.requestAnimationFrame = function(callback) {
+const frameId = nextFrameId++;
+if (paused) {
+pausedFrameCallbacks.set(frameId, callback);
+frameRecords.set(frameId, { paused: true });
+return frameId;
+}
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+return frameId;
+};
+window.cancelAnimationFrame = function(frameId) {
+const record = frameRecords.get(frameId);
+pausedFrameCallbacks.delete(frameId);
+if (record && typeof record.nativeFrameId !== 'undefined') {
+nativeCancelAnimationFrame(record.nativeFrameId);
+}
+frameRecords.delete(frameId);
+};
+window.setInterval = function(callback, delay) {
+const args = Array.prototype.slice.call(arguments, 2);
+return nativeSetInterval(function() {
+if (paused) return;
+callback.apply(this, args);
+}, delay);
+};
+const flushPausedFrames = function() {
+const callbacks = Array.from(pausedFrameCallbacks.entries());
+pausedFrameCallbacks.clear();
+callbacks.forEach(function(entry) {
+const frameId = entry[0];
+const callback = entry[1];
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+});
+};
+const setPaused = function(nextPaused) {
+const shouldPause = Boolean(nextPaused);
+if (paused === shouldPause) return;
+paused = shouldPause;
+document.documentElement.toggleAttribute('data-aura-preview-paused', paused);
+if (!paused) {
+flushPausedFrames();
+}
+};
+window.__auraPreviewPerformanceController = {
+setPaused: setPaused,
+get paused() {
+return paused;
+}
+};
+window.addEventListener('message', function(event) {
+if (event.source !== window.parent) return;
+if (!event.data || event.data.type !== 'aura-preview-performance-mode') return;
+setPaused(event.data.paused);
+});
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Visual Intelligence Insights | Percepvision</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: {
+100: '#0072FF',
+200: '#6aa0ff',
+300: '#e1ffff',
+},
+accent: {
+100: '#4D8BFF',
+200: '#003699',
+},
+neutral: {
+100: '#333333',
+200: '#5c5c5c',
+},
+bg: {
+100: '#FFFFFF',
+200: '#f5f5f5',
+300: '#cccccc',
+}
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+</style>
+<link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style><link id="all-fonts-link-font-newsreader" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&amp;display=swap"><style id="all-fonts-style-font-newsreader">.font-newsreader { font-family: 'Newsreader', serif !important; }</style><link id="all-fonts-link-font-google-sans-flex" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-google-sans-flex">.font-google-sans-flex { font-family: 'Google Sans Flex', sans-serif !important; }</style><link id="all-fonts-link-font-oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-oswald">.font-oswald { font-family: 'Oswald', sans-serif !important; }</style><link id="all-fonts-link-font-dm-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-dm-sans">.font-dm-sans { font-family: 'DM Sans', sans-serif !important; }</style><link id="all-fonts-link-font-cormorant" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-cormorant">.font-cormorant { font-family: 'Cormorant Garamond', serif !important; }</style></head>
+<body class="bg-bg-100 text-neutral-100 selection:bg-primary-300 selection:text-primary-100 flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="fixed start-0 border-bg-200 w-full z-50 border-b top-0 backdrop-blur-md bg-white/80">
+        <nav class="fixed w-full z-50 top-0 start-0 bg-white border-b border-gray-100">
+    <div class="flex flex-wrap max-w-7xl mx-auto py-4 px-6 items-center justify-between">
+        <!-- Logo Section -->
+        <a href="index.html" class="flex items-center gap-3">
+            <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+            <span class="self-center whitespace-nowrap text-2xl font-medium text-gray-900 tracking-tight">Percepvision</span>
+        </a>
+        
+        <!-- Desktop Navigation & CTA -->
+        <div class="hidden md:flex gap-8 gap-x-8 gap-y-8 items-center cursor-pointer" onclick="window.location.href='/#'" role="button">
+            <a href="solutions.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Solutions</a>
+            <a href="blog.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Insights</a>
+            <a href="contact.html" class="inline-flex items-center gap-2.5 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors">
+                <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                Contact Us
+            </a>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <div class="flex md:hidden items-center gap-4">
+            <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none" aria-controls="navbar-sticky" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" aria-hidden="true" class="lucide lucide-menu w-6 h-6"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div class="items-center justify-between hidden w-full md:hidden" id="navbar-sticky">
+            <ul class="flex flex-col p-4 mt-4 font-normal border border-gray-100 rounded-lg bg-gray-50 gap-2">
+                <li>
+                    <a href="index.html" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Solutions</a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Insights</a>
+                </li>
+                <li>
+                    <a href="contact.html" class="inline-flex items-center gap-2 mt-2 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors w-max">
+                        <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                        Contact Us
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+    </nav>
+
+    <!-- Featured Blog List Header Section -->
+    <header class="md:pt-40 md:pb-20 overflow-hidden border-bg-200 border-b pt-32 pb-16 relative">
+        <!-- Background decorative elements -->
+        <div class="-translate-x-1/2 z-0 pointer-events-none w-full h-full absolute top-0 left-1/2">
+            <div class="blur-[120px] opacity-30 mix-blend-multiply w-[500px] h-[500px] rounded-full absolute top-0 right-0"></div>
+            <div class="blur-[80px] opacity-60 w-[400px] h-[400px] rounded-full absolute bottom-0 left-0"></div>
+        </div>
+
+        <div class="z-10 max-w-7xl mr-auto ml-auto pr-6 pl-6 relative">
+            <div class="max-w-3xl mb-16">
+                <div class="inline-flex gap-2 text-xs font-medium text-neutral-200 bg-bg-200 border-bg-300 border rounded-full mb-6 pt-1 pr-3 pb-1 pl-3 gap-x-2 gap-y-2 items-center">
+  <span class="w-2 h-2 rounded-full bg-primary-100"></span>
+  Insights
+</div>
+                <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-neutral-100 mb-6 leading-tight">Insights into <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-100 to-accent-200">AI-powered Visual Intelligence</span></h1>
+                <p class="text-xl text-neutral-200 font-normal leading-relaxed">Perspectives on operational intelligence, enterprise AI, smart infrastructure and the future of safer, more efficient physical environments.</p>
+            </div>
+
+            <!-- Featured Post Card -->
+            <a href="blog-post-paddington" class="group relative block rounded-2xl overflow-hidden border border-bg-300 bg-white shadow-sm hover:shadow-xl transition-all duration-300">
+                <div class="grid md:grid-cols-2 gap-0">
+                    <div class="relative h-[300px] md:h-auto overflow-hidden">
+                        <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/9b0bad33-0bdf-4e72-817e-47610b4f1029_1600w.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Paddington Square Building" onclick="window.location.href='blog-post-paddington.html'" role="button">
+                    </div>
+                    <div class="p-8 md:p-12 flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="bg-primary-100/10 text-primary-100 text-xs font-semibold px-2.5 py-1 rounded-md uppercase tracking-wider">Featured</span>
+                            <span class="text-sm text-neutral-200">Dec 31, 2025</span>
+                        </div>
+                        
+                        <h2 class="text-3xl font-semibold text-primary-100 tracking-tight mb-4 leading-tight group-hover:text-accent-200 transition-colors cursor-pointer" onclick="window.location.href='blog-post-paddington.html'" role="button">
+                            Beyond Footfall: How AI Video Analytics Is Unlocking Millions in Value at Paddington Square
+                        </h2>
+                        
+                        <p class="leading-relaxed text-lg text-neutral-200 mb-8">
+                            Paddington Square is one of London’s most ambitious new destinations. We’re proud to share how PercepVision AI, in partnership with CIS Security, has transformed this landmark into a data‑driven environment.
+                        </p>
+                        
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex items-center gap-3">
+                                <div class="border-bg-300 bg-white flex text-xs font-semibold text-neutral-200 w-12 h-12 border rounded-full items-center justify-center">XY</div>
+                                <div class="">
+                                    <div class="text-sm font-medium text-neutral-100">Xiaoyun Yang</div>
+                                    <div class="text-xs text-neutral-200">CEO of Percepvision</div>
+                                </div>
+                            </div>
+                            <span class="flex items-center text-primary-100 font-medium text-sm group-hover:translate-x-1 transition-transform">
+                                Read Article <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" aria-hidden="true" class="lucide lucide-arrow-right w-4 h-4 ml-2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <!-- Blog List Section -->
+    <section class="pt-24 pb-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex mb-12 items-center justify-between">
+                <h2 class="text-2xl font-semibold tracking-tight text-neutral-100">Latest Articles</h2>
+                
+                <!-- Simple Filter Dropdown Custom UI -->
+                <div class="relative group">
+                    
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
+                
+                <!-- Post 1 -->
+                <article class="flex flex-col group h-full">
+                    <a href="blog-post-paddington2.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200 shadow-sm group-hover:shadow-lg transition-all duration-300">
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&amp;fit=crop&amp;q=80&amp;w=2070" alt="Paddington Square Glass Building" class="group-hover:scale-105 transition-transform duration-500 w-full h-full object-cover cursor-pointer" onclick="event.preventDefault(); event.stopPropagation(); window.location.href='blog-post-paddington2.html';" role="button">
+                    </a>
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex gap-3 mb-3 gap-x-3 gap-y-3 items-center">
+                            <span class="text-primary-100 uppercase text-xs font-semibold tracking-wide">UPDATES</span>
+                            <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+                            <span class="text-neutral-200 text-xs">Nov 6, 2025</span>
+                        </div>
+                        <h3 class="group-hover:text-primary-100 transition-colors cursor-pointer text-xl font-semibold text-neutral-100 tracking-tight mb-3" onclick="window.location.href='blog-post-paddington2.html';window.location.href='blog-post-paddington2.html';window.location.href='blog-post-paddington2.html';window.location.href='blog-post-paddington2.html';window.location.href='blog-post-paddington2.html';window.location.href='blog-post-paddington2.html';window.location.href='/#'" role="button">
+                            <a href="blog-post-paddington2.html" class="">Enhancing Security and Operational Intelligence at Paddington Square with PercepVision AI</a>
+                        </h3>
+                        <p class="leading-relaxed line-clamp-3 text-lg text-neutral-200 mb-6">
+                            Following our featured success story, we dive deeper into the operational workflows that allow security teams to respond to incidents in real-time.
+                        </p>
+                        <div class="border-bg-200 flex gap-3 border-t mt-auto pt-4 gap-x-3 gap-y-3 items-center">
+                            <div class="w-8 h-8 rounded-full bg-bg-200 border border-bg-300 flex items-center justify-center text-xs font-semibold text-neutral-200">XY</div>
+                            <span class="text-sm font-medium text-neutral-100">Xiaoyun Yang</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="flex flex-col group h-full">
+                    <a href="blog-post-crowd.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200 shadow-sm group-hover:shadow-lg transition-all duration-300">
+                        <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/9adf9bae-7f4e-4537-ba28-dd28775359c8_800w.jpg" alt="Crowd Management" class="group-hover:scale-105 transition-transform duration-500 w-full h-full object-cover cursor-pointer" onclick="window.location.href='blog-post-crowd.html'" role="button">
+                    </a>
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-primary-100 uppercase text-xs font-semibold tracking-wide">Updates</span>
+                            <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+                            <span class="text-neutral-200 text-xs">Sep 25, 2025</span>
+                        </div>
+                        <h3 class="text-xl font-semibold tracking-tight text-neutral-100 mb-3 group-hover:text-primary-100 transition-colors">
+                            <a href="blog-post-crowd.html" class="">Smarter Spaces: How Crowd Management AI Is Reshaping Public Safety and Urban Flow</a>
+                        </h3>
+                        <p class="leading-relaxed line-clamp-3 text-lg text-neutral-200 mb-6">Managing density in public spaces requires more than just counting heads. Learn how behavioral analysis predicts congestion before it happens.</p>
+                        <div class="mt-auto pt-4 border-t border-bg-200 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-bg-200 border border-bg-300 flex items-center justify-center text-xs font-semibold text-neutral-200">XY</div>
+                            <span class="text-sm font-medium text-neutral-100">Xiaoyun Yang</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="flex flex-col group h-full">
+                    <a href="blog-post-podcast.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200 shadow-sm group-hover:shadow-lg transition-all duration-300">
+                        <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/c13b1dc0-e136-4971-ac4b-bbcc2bd7a805_800w.jpg" alt="Tony Fish Portrait" class="contrast-125 group-hover:scale-105 transition-transform duration-500 w-full h-full object-cover grayscale cursor-pointer" onclick="window.location.href='blog-post-podcast.html'" role="button">
+                    </a>
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-primary-100 text-xs font-semibold uppercase tracking-wide">Podcast</span>
+                            <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+                            <span class="text-neutral-200 text-xs">Jul 30, 2025</span>
+                        </div>
+                        <h3 class="text-xl font-semibold tracking-tight text-neutral-100 mb-3 group-hover:text-primary-100 transition-colors">
+                            <a href="blog-post-podcast.html" class="">Smart Facilities Podcast E2: Tony Fish on Housing as a Subscription</a>
+                        </h3>
+                        <p class="text-lg text-neutral-200 leading-relaxed mb-6 line-clamp-3">
+                            Tony Fish joins us to discuss the future of living as a service and the role of intelligent monitoring in shared residential spaces.
+                        </p>
+                        <div class="border-bg-200 flex gap-3 border-t mt-auto pt-4 gap-x-3 gap-y-3 items-center">
+                            <div class="w-8 h-8 rounded-full bg-bg-200 border border-bg-300 flex items-center justify-center text-xs font-semibold text-neutral-200">JH</div>
+                            <span class="text-sm font-medium text-neutral-100">Jacob Howard</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 4 -->
+                <article class="flex flex-col group h-full">
+                    <a href="blog-post-smartfacilities.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200 shadow-sm group-hover:shadow-lg transition-all duration-300">
+                        <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/aa7452ad-b197-4982-9c92-5d35df36bfad_800w.jpg" alt="Youssef Nadiri Portrait" class="contrast-125 group-hover:scale-105 transition-transform duration-500 w-full h-full object-cover grayscale cursor-pointer" onclick="window.location.href='blog-post-smartfacilities.html'" role="button">
+                    </a>
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex gap-3 mb-3 gap-x-3 gap-y-3 items-center">
+                            <span class="text-primary-100 uppercase text-xs font-semibold tracking-wide">Podcast</span>
+                            <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+                            <span class="text-neutral-200 text-xs">Jul 22, 2025</span>
+                        </div>
+                        <h3 class="text-xl font-semibold tracking-tight text-neutral-100 mb-3 group-hover:text-primary-100 transition-colors">
+                            <a href="blog-post-smartfacilities.html" class="">Edge AI and Urban Evolution: In Conversation with Youssef Nadiri of PNY Technologies</a>
+                        </h3>
+                        <p class="text-lg text-neutral-200 leading-relaxed mb-6 line-clamp-3">
+                            We sat down with PNY's Youssef Nadiri to explore how edge computing is enabling faster, privacy-preserving AI models in smart cities.
+                        </p>
+                        <div class="flex gap-3 border-bg-200 border-t mt-auto pt-4 gap-x-3 gap-y-3 items-center">
+                            <div class="w-8 h-8 rounded-full bg-bg-200 border border-bg-300 flex items-center justify-center text-xs font-semibold text-neutral-200">JH</div>
+                            <span class="text-sm font-medium text-neutral-100">Jacob Howard</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 5 -->
+                <article class="flex flex-col group h-full">
+                    <a href="blog-post-nvidiaprogram.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200 shadow-sm group-hover:shadow-lg transition-all duration-300">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;q=80&amp;w=2070" alt="AI Chip Technology" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer" onclick="window.location.href='blog-post-nvidiaprogram.html'" role="button">
+                    </a>
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-primary-100 uppercase text-xs font-semibold tracking-wide">Updates</span>
+                            <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+                            <span class="text-neutral-200 text-xs">Jun 23, 2025</span>
+                        </div>
+                        <h3 class="group-hover:text-primary-100 transition-colors text-xl font-semibold text-neutral-100 tracking-tight mb-3 cursor-pointer" onclick="window.location.href='blog-post-nvidiaprogram.html'" role="button">
+                            <a href="blog-post-nvidiaprogram.html" class="">PercepVision AI Joins NVIDIA Inception Program to Accelerate Growth in Smart Surveillance</a>
+                        </h3>
+                        <p class="text-lg text-neutral-200 leading-relaxed mb-6 line-clamp-3">
+                            We are thrilled to announce our acceptance into NVIDIA's accelerator program, granting us access to cutting-edge hardware and AI expertise.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-bg-200 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-bg-200 border border-bg-300 flex items-center justify-center text-xs font-semibold text-neutral-200">XY</div>
+                            <span class="text-sm font-medium text-neutral-100">Xiaoyun Yang</span>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+            
+            
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 pt-16 pb-8 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-16">
+          <div class="col-span-2 md:col-span-4 lg:col-span-2">
+            <a href="#" class="flex items-center space-x-3 mb-6">
+              <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+              <span class="text-xl font-medium text-gray-900 tracking-tight">
+                Percepvision
+              </span>
+            </a>
+            <p class="text-base text-gray-500 max-w-[280px] mb-8 leading-relaxed">
+              Intelligent security solutions for the modern enterprise. Powered
+              by advanced AI, designed for human use.
+            </p>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect width="4" height="12" x="2" y="9"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube">
+                  <path d="M2.5 7.1C2.6 6 3.6 5 4.8 5h14.4c1.2 0 2.2 1 2.3 2.1.1 1.2.1 2.6.1 4.9s0 3.7-.1 4.9c-.1 1.1-1.1 2.1-2.3 2.1H4.8c-1.2 0-2.2-1-2.3-2.1C2.4 15.7 2.4 14.3 2.4 12s0-3.7.1-4.9z"></path>
+                  <path d="M10 15l5-3-5-3v6z"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Product</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="index.html" class="hover:text-gray-900 transition-colors">
+                  Features
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Solutions</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="solutions.html" class="hover:text-gray-900 transition-colors">Hospitality</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Resources</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="blog.html" class="hover:text-gray-900 transition-colors">
+                  Blog
+                </a>
+              </li>
+              <li class="">
+                <a href="blog-post-paddington.html" class="hover:text-gray-900 transition-colors">
+                  Case Studies
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Company</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="contact.html" class="hover:text-gray-900 transition-colors">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Legal</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="privacy-policy.html" class="hover:text-gray-900 transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li class="">
+                <a href="terms-of-use.html" class="hover:text-gray-900 transition-colors">
+                  Terms of Use
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="text-base text-gray-500">
+            © 2025 Percepvision AI Limited. All rights reserved.
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-base text-gray-500">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script class="">
+        lucide.createIcons({
+            attrs: {
+                'stroke-width': '1.5'
+            }
+        });
+    </script>
+
+</body></html>

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en"><head><script id="aura-preview-performance-controller">
+(function() {
+if (window.__auraPreviewPerformanceController) return;
+const nativeRequestAnimationFrame = window.requestAnimationFrame
+? window.requestAnimationFrame.bind(window)
+: function(callback) { return window.setTimeout(function() { callback(Date.now()); }, 16); };
+const nativeCancelAnimationFrame = window.cancelAnimationFrame
+? window.cancelAnimationFrame.bind(window)
+: window.clearTimeout.bind(window);
+const nativeSetInterval = window.setInterval.bind(window);
+let paused = false;
+let nextFrameId = 1;
+const frameRecords = new Map();
+const pausedFrameCallbacks = new Map();
+const style = document.createElement('style');
+style.id = 'aura-preview-performance-style';
+style.textContent = [
+'html[data-aura-preview-paused="true"] *,',
+'html[data-aura-preview-paused="true"] *::before,',
+'html[data-aura-preview-paused="true"] *::after {',
+'  animation-play-state: paused !important;',
+'  transition-duration: 0s !important;',
+'  scroll-behavior: auto !important;',
+'}'
+].join('\n');
+document.head.appendChild(style);
+window.requestAnimationFrame = function(callback) {
+const frameId = nextFrameId++;
+if (paused) {
+pausedFrameCallbacks.set(frameId, callback);
+frameRecords.set(frameId, { paused: true });
+return frameId;
+}
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+return frameId;
+};
+window.cancelAnimationFrame = function(frameId) {
+const record = frameRecords.get(frameId);
+pausedFrameCallbacks.delete(frameId);
+if (record && typeof record.nativeFrameId !== 'undefined') {
+nativeCancelAnimationFrame(record.nativeFrameId);
+}
+frameRecords.delete(frameId);
+};
+window.setInterval = function(callback, delay) {
+const args = Array.prototype.slice.call(arguments, 2);
+return nativeSetInterval(function() {
+if (paused) return;
+callback.apply(this, args);
+}, delay);
+};
+const flushPausedFrames = function() {
+const callbacks = Array.from(pausedFrameCallbacks.entries());
+pausedFrameCallbacks.clear();
+callbacks.forEach(function(entry) {
+const frameId = entry[0];
+const callback = entry[1];
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+});
+};
+const setPaused = function(nextPaused) {
+const shouldPause = Boolean(nextPaused);
+if (paused === shouldPause) return;
+paused = shouldPause;
+document.documentElement.toggleAttribute('data-aura-preview-paused', paused);
+if (!paused) {
+flushPausedFrames();
+}
+};
+window.__auraPreviewPerformanceController = {
+setPaused: setPaused,
+get paused() {
+return paused;
+}
+};
+window.addEventListener('message', function(event) {
+if (event.source !== window.parent) return;
+if (!event.data || event.data.type !== 'aura-preview-performance-mode') return;
+setPaused(event.data.paused);
+});
+})();
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="preload" href="https://www.percepvision.com/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2" as="font" crossorigin="" type="font/woff2">
+<link rel="stylesheet" href="./Privacy Notice _ Percepvision AI_files/665dc3aa4aa2d85c.css" data-precedence="next">
+<link rel="stylesheet" href="./Privacy Notice _ Percepvision AI_files/0ecd462a9744c41f.css" data-precedence="next">
+<link rel="preload" as="script" fetchpriority="low" href="./Privacy Notice _ Percepvision AI_files/266f2f67494ec323.js">
+<script src="./Privacy Notice _ Percepvision AI_files/652cd53c27924d50.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/1949bdd2d71d6b2f.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/987458e77989d7a3.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/turbopack-140af154a1a0d6ad.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/ff1a16fafef87110.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/d2be314c3ece3fbe.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/bad5677941305e49.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/912ec26e8a179548.js" async=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/e81262825f8abedc.js" async=""></script>
+<link rel="preload" href="./Privacy Notice _ Percepvision AI_files/js" as="script">
+<script src="./Privacy Notice _ Percepvision AI_files/a6dad97d9634a72d.js" nomodule=""></script>
+<script src="./Privacy Notice _ Percepvision AI_files/script.js" defer="" data-sdkn="@vercel/analytics/next" data-sdkv="1.3.1" data-disable-auto-track="1"></script>
+<script src="./Privacy Notice _ Percepvision AI_files/script(1).js" defer="" data-sdkn="@vercel/speed-insights/next" data-sdkv="1.3.1" data-route="/privacy-policy"></script>
+<script src="./Privacy Notice _ Percepvision AI_files/81f3052205fd5a73.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Notice | Percepvision AI</title>
+<meta name="description" content="Privacy Notice for PercepVision AI Limited, explaining how personal information is collected, used, stored, and protected.">
+<meta name="generator" content="Next.js">
+<meta name="keywords" content="AI video analytics,smart surveillance,crowd management,security AI,CCTV analytics,occupancy management">
+<link rel="icon" href="https://www.percepvision.com/icon-light-32x32.png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="https://www.percepvision.com/icon-dark-32x32.png" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="https://www.percepvision.com/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="https://www.percepvision.com/apple-icon.png">
+<meta name="next-size-adjust" content="">
+<script src="https://cdn.tailwindcss.com"></script></head>
+
+<body class="inter_5901b7c6-module__ec5Qua__variable font-sans antialiased selection:bg-[#e1ffff] selection:text-[#0072FF]">
+  <!--$--><!--/$-->
+  <script src="./Privacy Notice _ Percepvision AI_files/266f2f67494ec323.js" id="_R_" async=""></script>
+  <script>
+    (self.__next_f=self.__next_f||[]).push([0])
+  </script>
+  <script>
+    self.__next_f.push([1,"1:\"$Sreact.fragment\"\n2:I[39756,[\"/_next/static/chunks/ff1a16fafef87110.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/d2be314c3ece3fbe.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"default\"]\n3:I[37457,[\"/_next/static/chunks/ff1a16fafef87110.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/d2be314c3ece3fbe.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"default\"]\n4:I[2355,[\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"Analytics\"]\n5:I[57215,[\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"SpeedInsights\"]\n6:I[54576,[\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"GoogleAnalytics\"]\n7:I[63780,[\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/912ec26e8a179548.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/e81262825f8abedc.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"Navbar\"]\n8:I[41442,[\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/912ec26e8a179548.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/e81262825f8abedc.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"HeroSection\"]\n19:I[68027,[\"/_next/static/chunks/ff1a16fafef87110.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/d2be314c3ece3fbe.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"default\"]\n:HL[\"/_next/static/chunks/665dc3aa4aa2d85c.css?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"style\"]\n:HL[\"/_next/static/chunks/0ecd462a9744c41f.css?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"style\"]\n:HL[\"/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"0:{\"P\":null,\"b\":\"23EtnjYXeReJPxsPsPupE\",\"c\":[\"\",\"\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"__PAGE__\",{}]},\"$undefined\",\"$undefined\",true],[[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/665dc3aa4aa2d85c.css?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"link\",\"1\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/0ecd462a9744c41f.css?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"en\",\"children\":[\"$\",\"body\",null,{\"className\":\"inter_5901b7c6-module__ec5Qua__variable font-sans antialiased selection:bg-[#e1ffff] selection:text-[#0072FF]\",\"children\":[[\"$\",\"$L2\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L3\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}],[\"$\",\"$L4\",null,{}],[\"$\",\"$L5\",null,{}],[\"$\",\"$L6\",null,{\"gaId\":\"G-VVLW38ZKQ8\"}]]}]}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[[\"$\",\"div\",null,{\"className\":\"bg-white text-[#333333]\",\"children\":[[\"$\",\"$L7\",null,{}],[\"$\",\"main\",null,{\"children\":[[\"$\",\"$L8\",null,{}],[\"$\",\"section\",null,{\"className\":\"py-24 border-t border-[#e5e5e5] bg-white\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-7xl mx-auto px-6\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-center max-w-3xl mx-auto mb-20\",\"children\":[[\"$\",\"span\",null,{\"className\":\"text-[#0072FF] font-bold tracking-wider uppercase text-sm mb-4 block\",\"children\":\"Why Percepvision\"}],[\"$\",\"h2\",null,{\"className\":\"text-4xl md:text-5xl font-semibold tracking-tight text-[#333333] mb-6\",\"children\":\"Redefining surveillance with intelligence.\"}],[\"$\",\"p\",null,{\"className\":\"text-lg text-[#5c5c5c] leading-relaxed mx-auto max-w-2xl font-light\",\"children\":\"Our platform provides enterprise-grade AI analytics that deliver actionable insights while keeping your infrastructure costs to a minimum.\"}]]}],[\"$\",\"div\",null,{\"className\":\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8\",\"children\":[[\"$\",\"div\",\"Legacy Camera Integration\",{\"className\":\"p-8 rounded-[2rem] border border-[#cccccc] bg-white hover:shadow-lg transition-all duration-300 group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-14 h-14 bg-[#0072FF]/10 text-[#0072FF] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-camera w-7 h-7\",\"children\":[[\"$\",\"path\",\"1tc9qg\",{\"d\":\"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z\"}],[\"$\",\"circle\",\"1vg3eu\",{\"cx\":\"12\",\"cy\":\"13\",\"r\":\"3\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Legacy Camera Integration\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] leading-relaxed text-base\",\"children\":\"Works with existing CCTV \u0026 IP camera systems seamlessly with no hardware replacement.\"}]]}],\"$L9\",\"$La\",\"$Lb\",\"$Lc\",\"$Ld\"]}]]}]}],\"$Le\",\"$Lf\",\"$L10\",\"$L11\",\"$L12\",\"$L13\"]}],\"$L14\"]}],[\"$L15\",\"$L16\"],\"$L17\"]}],{},null,false,false]},null,false,false],\"$L18\",false]],\"m\":\"$undefined\",\"G\":[\"$19\",[]],\"S\":true}\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"2e:I[22016,[\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/912ec26e8a179548.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/e81262825f8abedc.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"\"]\n2f:I[5500,[\"/_next/static/chunks/bad5677941305e49.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/912ec26e8a179548.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/e81262825f8abedc.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"Image\"]\n34:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/d2be314c3ece3fbe.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"OutletBoundary\"]\n35:\"$Sreact.suspense\"\n37:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/d2be314c3ece3fbe.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"ViewportBoundary\"]\n39:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/d2be314c3ece3fbe.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"MetadataBoundary\"]\n9:[\"$\",\"div\",\"Real-time Safety Detection\",{\"className\":\"p-8 rounded-[2rem] border border-[#cccccc] bg-white hover:shadow-lg transition-all duration-300 group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-14 h-14 bg-[#0072FF]/10 text-[#0072FF] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-zap w-7 h-7\",\"children\":[[\"$\",\"path\",\"1xq2db\",{\"d\":\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Real-time Safety Detection\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] leading-relaxed text-base\",\"children\":\"Instant alerts for safety violations, accidents, and security threats with low latency.\"}]]}]\na:[\"$\",\"div\",\"Operational Analytics\",{\"className\":\"p-8 rounded-[2rem] border border-[#cccccc] bg-white hover:shadow-lg transition-all duration-300 group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-14 h-14 bg-[#0072FF]/10 text-[#0072FF] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-chart-column w-7 h-7\",\"children\":[[\"$\",\"path\",\"c24i48\",{\"d\":\"M3 3v16a2 2 0 0 0 2 2h16\"}],[\"$\",\"path\",\"2bz60n\",{\"d\":\"M18 17V9\"}],[\"$\",\"path\",\"1frdt8\",{\"d\":\"M13 17V5\"}],[\"$\",\"path\",\"17ska0\",{\"d\":\"M8 17v-3\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Operational Analytics\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] leading-relaxed text-base\",\"children\":\"Reduce operational costs and improve efficiency with data-driven traffic and queue insights.\"}]]}]\nb:[\"$\",\"div\",\"Nationwide Scalability\",{\"className\":\"p-8 rounded-[2rem] border border-[#cccccc] bg-white hover:shadow-lg transition-all duration-300 group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-14 h-14 bg-[#0072FF]/10 text-[#0072FF] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-globe w-7 h-7\",\"children\":[[\"$\",\"circle\",\"1mglay\",{\"cx\":\"12\",\"cy\":\"12\",\"r\":\"10\"}],[\"$\",\"path\",\"13o1zl\",{\"d\":\"M12 2a14.5 14.5 0 0 0 0 2"])
+  </script>
+  <script>
+    self.__next_f.push([1,"0 14.5 14.5 0 0 0 0-20\"}],[\"$\",\"path\",\"9i4pu4\",{\"d\":\"M2 12h20\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Nationwide Scalability\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] leading-relaxed text-base\",\"children\":\"Scale from single local sites to nationwide deployments with centralized management.\"}]]}]\nc:[\"$\",\"div\",\"Flexible Deployment\",{\"className\":\"p-8 rounded-[2rem] border border-[#cccccc] bg-white hover:shadow-lg transition-all duration-300 group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-14 h-14 bg-[#0072FF]/10 text-[#0072FF] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-layers w-7 h-7\",\"children\":[[\"$\",\"path\",\"8b97xw\",{\"d\":\"m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z\"}],[\"$\",\"path\",\"dd6zsq\",{\"d\":\"m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65\"}],[\"$\",\"path\",\"ep9fru\",{\"d\":\"m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Flexible Deployment\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] leading-relaxed text-base\",\"children\":\"Deployment models that fit your needs: On-premise, Edge computing, or Cloud-centralized.\"}]]}]\nd:[\"$\",\"div\",\"Enterprise-grade Security\",{\"className\":\"p-8 rounded-[2rem] border border-[#cccccc] bg-white hover:shadow-lg transition-all duration-300 group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-14 h-14 bg-[#0072FF]/10 text-[#0072FF] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-shield-check w-7 h-7\",\"children\":[[\"$\",\"path\",\"oel41y\",{\"d\":\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"}],[\"$\",\"path\",\"dzmm74\",{\"d\":\"m9 12 2 2 4-4\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Enterprise-grade Security\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] leading-relaxed text-base\",\"children\":\"Privacy-aware design with secure data handling and encryption at every stage.\"}]]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"e:[\"$\",\"section\",null,{\"className\":\"py-24 bg-[#f5f5f5]\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-7xl mx-auto px-6\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-center max-w-4xl mx-auto mb-20\",\"children\":[[\"$\",\"span\",null,{\"className\":\"text-[#0072FF] font-semibold tracking-tight uppercase text-sm\",\"children\":\"Features\"}],[\"$\",\"h2\",null,{\"className\":\"text-3xl md:text-5xl font-semibold tracking-tight text-[#333333] mt-2 mb-6\",\"children\":[[\"$\",\"span\",null,{\"className\":\"text-[#0072FF]\",\"children\":\"AI-driven video analytics\"}],\" features include:\"]}],[\"$\",\"p\",null,{\"className\":\"text-lg text-[#5c5c5c] leading-relaxed max-w-3xl mx-auto\",\"children\":\"Our AI-driven video analytics platform effortlessly connects with your current CCTV security camera and VMS setups. Experience real-time event alerts and reports that enhance your security, crowd management and business operations.\"}]]}],[\"$\",\"div\",null,{\"className\":\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16\",\"children\":[[\"$\",\"div\",\"Facial Recognition \u0026 Access Control\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-scan-face w-8 h-8\",\"children\":[[\"$\",\"path\",\"aa7l1z\",{\"d\":\"M3 7V5a2 2 0 0 1 2-2h2\"}],[\"$\",\"path\",\"4qcy5o\",{\"d\":\"M17 3h2a2 2 0 0 1 2 2v2\"}],[\"$\",\"path\",\"6vwrx8\",{\"d\":\"M21 17v2a2 2 0 0 1-2 2h-2\"}],[\"$\",\"path\",\"ioqczr\",{\"d\":\"M7 21H5a2 2 0 0 1-2-2v-2\"}],[\"$\",\"path\",\"1y1vjs\",{\"d\":\"M8 14s1.5 2 4 2 4-2 4-2\"}],[\"$\",\"path\",\"1q5me6\",{\"d\":\"M9 9h.01\"}],[\"$\",\"path\",\"x1ddxp\",{\"d\":\"M15 9h.01\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Facial Recognition \u0026 Access Control\"}]]}],[\"$\",\"div\",\"Occupancy Management\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-users w-8 h-8\",\"children\":[[\"$\",\"path\",\"1yyitq\",{\"d\":\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"}],[\"$\",\"circle\",\"nufk8\",{\"cx\":\"9\",\"cy\":\"7\",\"r\":\"4\"}],[\"$\",\"path\",\"kshegd\",{\"d\":\"M22 21v-2a4 4 0 0 0-3-3.87\"}],[\"$\",\"path\",\"1da9ce\",{\"d\":\"M16 3.13a4 4 0 0 1 0 7.75\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Occupancy Management\"}]]}],[\"$\",\"div\",\"Intrusion Detection\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-shield-alert w-8 h-8\",\"children\":[[\"$\",\"path\",\"oel41y\",{\"d\":\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"}],\"$L1a\",\"$L1b\",\"$undefined\"]}]}],\"$L1c\"]}],\"$L1d\",\"$L1e\",\"$L1f\",\"$L20\",\"$L21\",\"$L22\",\"$L23\",\"$L24\",\"$L25\"]}]]}]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"f:[\"$\",\"section\",null,{\"className\":\"py-24 bg-white\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-7xl mx-auto px-6\",\"children\":[\"$\",\"div\",null,{\"className\":\"grid grid-cols-1 lg:grid-cols-2 gap-16 items-center\",\"children\":[[\"$\",\"div\",null,{\"className\":\"order-2 lg:order-1 relative\",\"children\":[\"$\",\"div\",null,{\"className\":\"aspect-square rounded-2xl bg-gradient-to-tr from-[#f5f5f5] to-white border border-[#cccccc] p-8 relative overflow-hidden\",\"children\":[[\"$\",\"div\",null,{\"className\":\"absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50\"}],[\"$\",\"div\",null,{\"className\":\"absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#6aa0ff]/20 rounded-full blur-3xl\"}],[\"$\",\"div\",null,{\"className\":\"relative z-10 grid grid-cols-1 gap-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"bg-white p-4 rounded-xl shadow-lg border border-[#e5e5e5] flex items-center gap-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"p-2 bg-green-100 text-green-600 rounded-lg\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-shield-check w-5 h-5\",\"children\":[[\"$\",\"path\",\"oel41y\",{\"d\":\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"}],[\"$\",\"path\",\"dzmm74\",{\"d\":\"m9 12 2 2 4-4\"}],\"$undefined\"]}]}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"div\",null,{\"className\":\"text-sm font-semibold text-[#333333]\",\"children\":\"Safety Score\"}],[\"$\",\"div\",null,{\"className\":\"text-xs text-[#5c5c5c]\",\"children\":\"Increased by 45%\"}]]}]]}],[\"$\",\"div\",null,{\"className\":\"bg-white p-4 rounded-xl shadow-lg border border-[#e5e5e5] flex items-center gap-4 ml-8\",\"children\":[[\"$\",\"div\",null,{\"className\":\"p-2 bg-blue-100 text-blue-600 rounded-lg\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-clock w-5 h-5\",\"children\":[[\"$\",\"circle\",\"1mglay\",{\"cx\":\"12\",\"cy\":\"12\",\"r\":\"10\"}],[\"$\",\"polyline\",\"68esgv\",{\"points\":\"12 6 12 12 16 14\"}],\"$undefined\"]}]}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"div\",null,{\"className\":\"text-sm font-semibold text-[#333333]\",\"children\":\"Response Time\"}],[\"$\",\"div\",null,{\"className\":\"text-xs text-[#5c5c5c]\",\"children\":\"Reduced by 3 mins\"}]]}]]}],[\"$\",\"div\",null,{\"className\":\"bg-white p-4 rounded-xl shadow-lg border border-[#e5e5e5] flex items-center gap-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"p-2 bg-purple-100 text-purple-600 rounded-lg\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-trending-up w-5 h-5\",\"children\":[[\"$\",\"polyline\",\"126l90\",{\"points\":\"22 7 13.5 15.5 8.5 10.5 2 17\"}],[\"$\",\"polyline\",\"kwv8wd\",{\"points\":\"16 7 22 7 22 13\"}],\"$undefined\"]}]}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"div\",null,{\"className\":\"text-sm font-semibold text-[#333333]\",\"children\":\"Ops Efficiency\"}],[\"$\",\"div\",null,{\"className\":\"text-xs text-[#5c5c5c]\",\"children\":\"Optimized\"}]]}]]}]]}]]}]}],[\"$\",\"div\",null,{\"className\":\"order-1 lg:order-2\",\"children\":[[\"$\",\"span\",null,{\"className\":\"text-[#0072FF] uppercase text-sm font-semibold tracking-tight\",\"children\":\"Why Percepvision\"}],[\"$\",\"h2\",null,{\"className\":\"text-3xl md:text-4xl font-semibold tracking-tight text-[#333333] mt-2 mb-6\",\"children\":\"Designed for peace of mind.\"}],[\"$\",\"p\",null,{\"className\":\"text-xl text-[#5c5c5c] mb-8 leading-relaxed\",\"children\":\"Security should not be a burden. Percepvision streamlines your operations while providing a layer of safety that never sleeps.\"}],[\"$\",\"ul\",null,{\"className\":\"space-y-6\",\"children\":[[\"$\",\"li\",\"Increased Safety\",{\"className\":\"flex items-start\",\"children\":[[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-circle-check w-6 h-6 text-[#0072FF] mt-1 flex-shrink-0\",\"children\":[\"$L26\",\"$L27\",\"$undefined\"]}],\"$L28\"]}],\"$L29\",\"$L2a\"]}]]}]]}]}]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"10:[\"$\",\"section\",null,{\"className\":\"py-24 bg-[#f5f5f5] border-t border-[#e5e5e5]\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-7xl mx-auto px-6 text-center\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-[#0072FF] font-bold tracking-wider uppercase text-sm mb-4\",\"children\":\"The Process\"}],[\"$\",\"h2\",null,{\"className\":\"text-4xl md:text-5xl font-semibold tracking-tight text-[#333333] mb-20\",\"children\":\"Upgrade Your Existing Cameras\"}],[\"$\",\"div\",null,{\"className\":\"relative grid grid-cols-1 md:grid-cols-3 gap-8\",\"children\":[[\"$\",\"div\",null,{\"className\":\"hidden md:block absolute top-12 left-0 w-full h-px bg-[#cccccc] -z-10 transform scale-x-75\"}],[[\"$\",\"div\",\"Connect\",{\"className\":\"relative flex flex-col items-center\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 z-10 border border-[#cccccc]\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-network w-10 h-10 text-[#5c5c5c]\",\"children\":[[\"$\",\"rect\",\"4q2zg0\",{\"x\":\"16\",\"y\":\"16\",\"width\":\"6\",\"height\":\"6\",\"rx\":\"1\"}],[\"$\",\"rect\",\"8cvhb9\",{\"x\":\"2\",\"y\":\"16\",\"width\":\"6\",\"height\":\"6\",\"rx\":\"1\"}],[\"$\",\"rect\",\"1egb70\",{\"x\":\"9\",\"y\":\"2\",\"width\":\"6\",\"height\":\"6\",\"rx\":\"1\"}],[\"$\",\"path\",\"1jsf9p\",{\"d\":\"M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3\"}],[\"$\",\"path\",\"2874zd\",{\"d\":\"M12 12V8\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Connect\"}],[\"$\",\"p\",null,{\"className\":\"text-base text-[#5c5c5c] leading-relaxed max-w-xs mx-auto\",\"children\":\"Connect to existing IP cameras and VMS seamlessly with no hardware replacement.\"}]]}],[\"$\",\"div\",\"Analyze\",{\"className\":\"relative flex flex-col items-center\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 z-10 border-2 border-[#0072FF] shadow-xl shadow-[#0072FF]/10\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-cpu w-10 h-10 text-[#0072FF]\",\"children\":[[\"$\",\"rect\",\"14l7u7\",{\"width\":\"16\",\"height\":\"16\",\"x\":\"4\",\"y\":\"4\",\"rx\":\"2\"}],[\"$\",\"rect\",\"5aljv4\",{\"width\":\"6\",\"height\":\"6\",\"x\":\"9\",\"y\":\"9\",\"rx\":\"1\"}],[\"$\",\"path\",\"13l42r\",{\"d\":\"M15 2v2\"}],[\"$\",\"path\",\"15mkzm\",{\"d\":\"M15 20v2\"}],[\"$\",\"path\",\"1gxd5l\",{\"d\":\"M2 15h2\"}],[\"$\",\"path\",\"1bbxkp\",{\"d\":\"M2 9h2\"}],[\"$\",\"path\",\"19e6y8\",{\"d\":\"M20 15h2\"}],[\"$\",\"path\",\"19tzq7\",{\"d\":\"M20 9h2\"}],[\"$\",\"path\",\"165o2o\",{\"d\":\"M9 2v2\"}],[\"$\",\"path\",\"i2bqo8\",{\"d\":\"M9 20v2\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Analyze\"}],[\"$\",\"p\",null,{\"className\":\"text-base text-[#5c5c5c] leading-relaxed max-w-xs mx-auto\",\"children\":\"Our AI models scan your environment, learning patterns and detecting anomalies in real-time.\"}]]}],[\"$\",\"div\",\"Act\",{\"className\":\"relative flex flex-col items-center\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 z-10 border border-[#cccccc]\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-server w-10 h-10 text-[#5c5c5c]\",\"children\":[[\"$\",\"rect\",\"ngkwjq\",{\"width\":\"20\",\"height\":\"8\",\"x\":\"2\",\"y\":\"2\",\"rx\":\"2\",\"ry\":\"2\"}],[\"$\",\"rect\",\"iecqi9\",{\"width\":\"20\",\"height\":\"8\",\"x\":\"2\",\"y\":\"14\",\"rx\":\"2\",\"ry\":\"2\"}],[\"$\",\"line\",\"16zg32\",{\"x1\":\"6\",\"x2\":\"6.01\",\"y1\":\"6\",\"y2\":\"6\"}],[\"$\",\"line\",\"nzw8ys\",{\"x1\":\"6\",\"x2\":\"6.01\",\"y1\":\"18\",\"y2\":\"18\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-xl font-semibold text-[#333333] mb-3 tracking-tight\",\"children\":\"Act\"}],[\"$\",\"p\",null,{\"className\":\"text-base text-[#5c5c5c] leading-relaxed max-w-xs mx-auto\",\"children\":\"Deploy AI analytics locally or in the cloud to get instant alerts on your dashboard.\"}]]}]]]}]]}]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"11:[\"$\",\"section\",null,{\"className\":\"py-24 bg-[#003699] text-white\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-7xl mx-auto px-6\",\"children\":[\"$\",\"div\",null,{\"className\":\"grid grid-cols-1 md:grid-cols-3 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-white/20\",\"children\":[[\"$\",\"div\",\"Detection Accuracy\",{\"className\":\"p-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-6xl font-semibold tracking-tighter mb-2\",\"children\":\"99.9%\"}],[\"$\",\"div\",null,{\"className\":\"text-lg text-[#6aa0ff] font-medium\",\"children\":\"Detection Accuracy\"}]]}],[\"$\",\"div\",\"Detection Speed\",{\"className\":\"p-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-6xl font-semibold tracking-tighter mb-2\",\"children\":\"\u003c0.1s\"}],[\"$\",\"div\",null,{\"className\":\"text-lg text-[#6aa0ff] font-medium\",\"children\":\"Detection Speed\"}]]}],[\"$\",\"div\",\"Enterprise Installs\",{\"className\":\"p-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-6xl font-semibold tracking-tighter mb-2\",\"children\":\"500+\"}],[\"$\",\"div\",null,{\"className\":\"text-lg text-[#6aa0ff] font-medium\",\"children\":\"Enterprise Installs\"}]]}]]}]}]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"12:[\"$\",\"section\",null,{\"className\":\"py-24\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-7xl mx-auto px-6\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-center mb-16\",\"children\":[\"$\",\"h2\",null,{\"className\":\"text-3xl md:text-4xl font-semibold tracking-tight text-[#333333]\",\"children\":\"Trusted by Industry Leaders\"}]}],[\"$\",\"div\",null,{\"className\":\"grid grid-cols-1 md:grid-cols-2 gap-8\",\"children\":[[\"$\",\"div\",\"Kuldeep Kainth\",{\"className\":\"bg-white p-10 rounded-2xl shadow-sm border border-[#cccccc]\",\"children\":[[\"$\",\"div\",null,{\"className\":\"flex gap-1 mb-6 text-[#0072FF]\",\"children\":[[\"$\",\"svg\",\"0\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"1\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"2\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"3\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"4\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}]]}],\"$L2b\",\"$L2c\"]}],\"$L2d\"]}]]}]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"13:[\"$\",\"section\",null,{\"className\":\"py-24\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-4xl mx-auto px-6 text-center\",\"children\":[[\"$\",\"h2\",null,{\"className\":\"text-4xl md:text-5xl font-semibold tracking-tight text-[#333333] mb-6\",\"children\":\"Ready to secure your world?\"}],[\"$\",\"p\",null,{\"className\":\"text-xl text-[#5c5c5c] mb-10 leading-relaxed\",\"children\":\"Join the forward-thinking companies using Percepvision to protect their assets and people. Schedule a personalized consultation today.\"}],[\"$\",\"div\",null,{\"className\":\"flex flex-col sm:flex-row items-center justify-center gap-4\",\"children\":[[\"$\",\"$L2e\",null,{\"href\":\"/contact\",\"className\":\"w-full sm:w-auto px-8 py-4 bg-[#0072FF] text-white font-medium rounded-full hover:bg-[#003699] transition-colors shadow-lg shadow-[#0072FF]/30\",\"children\":\"Schedule Consultation\"}],[\"$\",\"span\",null,{\"className\":\"w-full sm:w-auto px-8 py-4 bg-transparent text-[#333333] border border-[#cccccc] font-medium rounded-full cursor-not-allowed opacity-50\",\"children\":\"View Pricing\"}]]}]]}]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"14:[\"$\",\"footer\",null,{\"className\":\"border-[#cccccc] border-t pt-16 pb-8\",\"children\":[\"$\",\"div\",null,{\"className\":\"max-w-7xl mx-auto px-6\",\"children\":[[\"$\",\"div\",null,{\"className\":\"grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-12\",\"children\":[[\"$\",\"div\",null,{\"className\":\"col-span-2 md:col-span-4 lg:col-span-2 flex flex-col pr-4 items-start\",\"children\":[[\"$\",\"$L2e\",null,{\"href\":\"/\",\"className\":\"flex items-center gap-2.5 mb-5 group\",\"children\":[[\"$\",\"$L2f\",null,{\"src\":\"https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png\",\"alt\":\"Percepvision Logo\",\"width\":32,\"height\":32,\"className\":\"w-8 h-8 object-contain rounded-lg\"}],[\"$\",\"span\",null,{\"className\":\"text-lg font-medium text-[#333333] tracking-tight group-hover:text-[#0072FF] transition-colors\",\"children\":\"Percepvision\"}]]}],[\"$\",\"p\",null,{\"className\":\"leading-relaxed text-sm font-light text-[#5c5c5c] max-w-sm mb-6\",\"children\":\"Intelligent security solutions for the modern enterprise. Powered by advanced AI, designed for human use.\"}],[\"$\",\"div\",null,{\"className\":\"flex gap-4 items-center\",\"children\":[[\"$\",\"a\",null,{\"href\":\"https://www.x.com\",\"target\":\"_blank\",\"rel\":\"noopener noreferrer\",\"aria-label\":\"X (formerly Twitter)\",\"className\":\"inline-flex align-middle ml-1 hover:text-[#0072FF] transition-colors\",\"children\":[\"$\",\"svg\",null,{\"viewBox\":\"0 0 24 24\",\"fill\":\"currentColor\",\"className\":\"w-[14px] h-[14px] text-[#5c5c5c] hover:text-[#0072FF] transition-colors\",\"aria-hidden\":\"true\",\"children\":[\"$\",\"path\",null,{\"d\":\"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z\"}]}]}],[\"$\",\"a\",null,{\"href\":\"https://www.linkedin.com/company/percepvision-ai/\",\"target\":\"_blank\",\"rel\":\"noopener noreferrer\",\"aria-label\":\"LinkedIn\",\"className\":\"text-[#5c5c5c] hover:text-[#0072FF] transition-colors\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-linkedin w-5 h-5\",\"children\":[[\"$\",\"path\",\"c2jq9f\",{\"d\":\"M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z\"}],[\"$\",\"rect\",\"mk3on5\",{\"width\":\"4\",\"height\":\"12\",\"x\":\"2\",\"y\":\"9\"}],[\"$\",\"circle\",\"bt5ra8\",{\"cx\":\"4\",\"cy\":\"4\",\"r\":\"2\"}],\"$undefined\"]}]}],[\"$\",\"a\",null,{\"href\":\"https://www.youtube.com/@PercepVision-AI\",\"target\":\"_blank\",\"rel\":\"noopener noreferrer\",\"aria-label\":\"YouTube\",\"className\":\"text-[#5c5c5c] hover:text-[#0072FF] transition-colors\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-youtube w-5 h-5\",\"children\":[[\"$\",\"path\",\"1q2vi4\",{\"d\":\"M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17\"}],[\"$\",\"path\",\"1jp15x\",{\"d\":\"m10 15 5-3-5-3z\"}],\"$undefined\"]}]}]]}]]}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"h4\",null,{\"className\":\"font-medium text-[#333333] mb-4 text-sm\",\"children\":\"Product\"}],[\"$\",\"ul\",null,{\"className\":\"text-sm text-[#5c5c5c] space-y-3\",\"children\":[\"$\",\"li\",null,{\"children\":[\"$\",\"$L2e\",null,{\"href\":\"/\",\"className\":\"hover:text-[#0072FF] transition-colors block\",\"children\":\"Features\"}]}]}]]}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"h4\",null,{\"className\":\"font-medium text-[#333333] mb-4 text-sm\",\"children\":\"Solutions\"}],[\"$\",\"ul\",null,{\"className\":\"space-y-3 text-sm text-[#5c5c5c]\",\"children\":[\"$\",\"li\",null,{\"children\":[\"$\",\"$L2e\",null,{\"href\":\"/solutions\",\"className\":\"hover:text-[#0072FF] transition-colors block\",\"children\":\"Mixed-Use\"}]}]}]]}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"h4\",null,{\"className\":\"font-medium text-[#333333] mb-4 text-sm\",\"children\":\"Resources\"}],[\"$\",\"ul\",null,{\"className\":\"space-y-3 text-sm text-[#5c5c5c]\",\"children\":[[\"$\",\"li\",null,{\"children\":[\"$\",\"$L2e\",null,{\"href\":\"/blog\",\"className\":\"hover:text-[#0072FF] transition-colors block\",\"children\":\"Blog\"}]}],\"$L30\"]}]]}],\"$L31\",\"$L32\"]}],\"$L33\"]}]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"15:[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/912ec26e8a179548.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"async\":true,\"nonce\":\"$undefined\"}]\n16:[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/e81262825f8abedc.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"async\":true,\"nonce\":\"$undefined\"}]\n17:[\"$\",\"$L34\",null,{\"children\":[\"$\",\"$35\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@36\"}]}]\n18:[\"$\",\"$1\",\"h\",{\"children\":[null,[\"$\",\"$L37\",null,{\"children\":\"$L38\"}],[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$L39\",null,{\"children\":[\"$\",\"$35\",null,{\"name\":\"Next.Metadata\",\"children\":\"$L3a\"}]}]}],[\"$\",\"meta\",null,{\"name\":\"next-size-adjust\",\"content\":\"\"}]]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"1a:[\"$\",\"path\",\"1got3b\",{\"d\":\"M12 8v4\"}]\n1b:[\"$\",\"path\",\"1drbdi\",{\"d\":\"M12 16h.01\"}]\n1c:[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Intrusion Detection\"}]\n1d:[\"$\",\"div\",\"Violence \u0026 Threat Detection\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-triangle-alert w-8 h-8\",\"children\":[[\"$\",\"path\",\"wmoenq\",{\"d\":\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"}],[\"$\",\"path\",\"juzpu7\",{\"d\":\"M12 9v4\"}],[\"$\",\"path\",\"p32p05\",{\"d\":\"M12 17h.01\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Violence \u0026 Threat Detection\"}]]}]\n1e:[\"$\",\"div\",\"Tailgating Prevention\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-footprints w-8 h-8\",\"children\":[[\"$\",\"path\",\"1dudjm\",{\"d\":\"M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z\"}],[\"$\",\"path\",\"l2t8xc\",{\"d\":\"M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z\"}],[\"$\",\"path\",\"1dejxt\",{\"d\":\"M16 17h4\"}],[\"$\",\"path\",\"1bwh8b\",{\"d\":\"M4 13h4\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Tailgating Prevention\"}]]}]\n1f:[\"$\",\"div\",\"Search and Investigation\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-file-search w-8 h-8\",\"children\":[[\"$\",\"path\",\"tnqrlb\",{\"d\":\"M14 2v4a2 2 0 0 0 2 2h4\"}],[\"$\",\"path\",\"ms7g94\",{\"d\":\"M4.268 21a2 2 0 0 0 1.727 1H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3\"}],[\"$\",\"path\",\"1j6qii\",{\"d\":\"m9 18-1.5-1.5\"}],[\"$\",\"circle\",\"ufru5t\",{\"cx\":\"5\",\"cy\":\"14\",\"r\":\"3\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Search and Investigation\"}]]}]\n20:[\"$\",\"div\",\"Smoke and Fire Detection\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":"])
+  </script>
+  <script>
+    self.__next_f.push([1,"\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-flame w-8 h-8\",\"children\":[[\"$\",\"path\",\"96xj49\",{\"d\":\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Smoke and Fire Detection\"}]]}]\n21:[\"$\",\"div\",\"Car Park Management\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-car w-8 h-8\",\"children\":[[\"$\",\"path\",\"5owen\",{\"d\":\"M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2\"}],[\"$\",\"circle\",\"u2ysq9\",{\"cx\":\"7\",\"cy\":\"17\",\"r\":\"2\"}],[\"$\",\"path\",\"r8uit2\",{\"d\":\"M9 17h6\"}],[\"$\",\"circle\",\"axvx0g\",{\"cx\":\"17\",\"cy\":\"17\",\"r\":\"2\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Car Park Management\"}]]}]\n22:[\"$\",\"div\",\"Business Intelligence\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-chart-column-big w-8 h-8\",\"children\":[[\"$\",\"path\",\"c24i48\",{\"d\":\"M3 3v16a2 2 0 0 0 2 2h16\"}],[\"$\",\"rect\",\"q8uenq\",{\"x\":\"15\",\"y\":\"5\",\"width\":\"4\",\"height\":\"12\",\"rx\":\"1\"}],[\"$\",\"rect\",\"sr5ea\",{\"x\":\"7\",\"y\":\"8\",\"width\":\"4\",\"height\":\"9\",\"rx\":\"1\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Business Intelligence\"}]]}]\n23:[\"$\",\"div\",\"Slip, Trip and Fall Detection\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-activity w-8 h-8\",\"children\":[[\"$\",\"path\",\"169zse\",{\"d\":\"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Slip, Trip and Fall Detection\"}]]}]\n24:[\"$\",\"div\",\"Unattended Object Detection\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width"])
+  </script>
+  <script>
+    self.__next_f.push([1,"\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-package w-8 h-8\",\"children\":[[\"$\",\"path\",\"1a0edw\",{\"d\":\"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z\"}],[\"$\",\"path\",\"d0xqtd\",{\"d\":\"M12 22V12\"}],[\"$\",\"path\",\"yx3hmr\",{\"d\":\"m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7\"}],[\"$\",\"path\",\"1c824w\",{\"d\":\"m7.5 4.27 9 5.15\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Unattended Object Detection\"}]]}]\n25:[\"$\",\"div\",\"Weapon Detection\",{\"className\":\"flex flex-col items-center text-center group\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-16 h-16 rounded-2xl bg-white border border-[#cccccc] shadow-sm flex items-center justify-center mb-5 text-[#333333] group-hover:scale-110 group-hover:border-[#0072FF]/30 group-hover:text-[#0072FF] group-hover:shadow-lg transition-all duration-300\",\"children\":[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-crosshair w-8 h-8\",\"children\":[[\"$\",\"circle\",\"1mglay\",{\"cx\":\"12\",\"cy\":\"12\",\"r\":\"10\"}],[\"$\",\"line\",\"l9bcsi\",{\"x1\":\"22\",\"x2\":\"18\",\"y1\":\"12\",\"y2\":\"12\"}],[\"$\",\"line\",\"13hhkx\",{\"x1\":\"6\",\"x2\":\"2\",\"y1\":\"12\",\"y2\":\"12\"}],[\"$\",\"line\",\"10w3f3\",{\"x1\":\"12\",\"x2\":\"12\",\"y1\":\"6\",\"y2\":\"2\"}],[\"$\",\"line\",\"15g9kq\",{\"x1\":\"12\",\"x2\":\"12\",\"y1\":\"22\",\"y2\":\"18\"}],\"$undefined\"]}]}],[\"$\",\"h3\",null,{\"className\":\"text-lg font-semibold text-[#333333] tracking-tight\",\"children\":\"Weapon Detection\"}]]}]\n26:[\"$\",\"circle\",\"1mglay\",{\"cx\":\"12\",\"cy\":\"12\",\"r\":\"10\"}]\n27:[\"$\",\"path\",\"dzmm74\",{\"d\":\"m9 12 2 2 4-4\"}]\n28:[\"$\",\"div\",null,{\"className\":\"ml-4\",\"children\":[[\"$\",\"h4\",null,{\"className\":\"text-lg font-semibold text-[#333333]\",\"children\":\"Increased Safety\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] mt-1 text-lg\",\"children\":\"Proactive alerts prevent incidents before they escalate.\"}]]}]\n29:[\"$\",\"li\",\"Reduced Response Times\",{\"className\":\"flex items-start\",\"children\":[[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-circle-check w-6 h-6 text-[#0072FF] mt-1 flex-shrink-0\",\"children\":[[\"$\",\"circle\",\"1mglay\",{\"cx\":\"12\",\"cy\":\"12\",\"r\":\"10\"}],[\"$\",\"path\",\"dzmm74\",{\"d\":\"m9 12 2 2 4-4\"}],\"$undefined\"]}],[\"$\",\"div\",null,{\"className\":\"ml-4\",\"children\":[[\"$\",\"h4\",null,{\"className\":\"text-lg font-semibold text-[#333333]\",\"children\":\"Reduced Response Times\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] mt-1 text-lg\",\"children\":\"Direct integration with security teams cuts latency.\"}]]}]]}]\n2a:[\"$\",\"li\",\"Actionable Insights\",{\"className\":\"flex items-start\",\"children\":[[\"$\",\"svg\",null,{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":1.5,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-circle-check w-6 h-6 text-[#0072FF] mt-1 flex-shrink-0\",\"children\":[[\"$\",\"circle\",\"1mglay\",{\"cx\":\"12\",\"cy\":\"12\",\"r\":\"10\"}],[\"$\",\"path\",\"dzmm74\",{\"d\":\"m9 12 2 2 4-4\"}],\"$undefined\"]}],[\"$\",\"div\",null,{\"className\":\"ml-4\",\"children\":[[\"$\",\"h4\",null,{\"className\":\"text-lg font-semibold text-[#333333]\",\"children\":\"Actionable Insights\"}],[\"$\",\"p\",null,{\"className\":\"text-[#5c5c5c] mt-1 text-lg\",\"children\":\"Data-driven decisions for property managers.\"}]]}]]}]\n2b:[\"$\",\"blockquote\",null,{\"className\":\"text-xl text-[#333333] font-medium leading-relaxed mb-6\",\"children\":[\"“\",\"The advanced analytics are fundamental to our security protocols. Intrusion detection, loitering detection, and unattended obiect detection provide crucial proactive monitoring capabilities instantly alerting our teams before activi"])
+  </script>
+  <script>
+    self.__next_f.push([1,"ty can escalate. The platform has elevated our operational planning, asset value, and public safety standards.\",\"”\"]}]\n2c:[\"$\",\"div\",null,{\"className\":\"flex items-center gap-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-12 h-12 bg-[#5c5c5c] rounded-full\"}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"div\",null,{\"className\":\"text-base font-semibold text-[#333333]\",\"children\":\"Kuldeep Kainth\"}],[\"$\",\"div\",null,{\"className\":\"text-sm text-[#5c5c5c]\",\"children\":\"Director of Innovative Solutions, CIS Security\"}]]}]]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"2d:[\"$\",\"div\",\"Robert Yang\",{\"className\":\"bg-white p-10 rounded-2xl shadow-sm border border-[#cccccc]\",\"children\":[[\"$\",\"div\",null,{\"className\":\"flex gap-1 mb-6 text-[#0072FF]\",\"children\":[[\"$\",\"svg\",\"0\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"1\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"2\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"3\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}],[\"$\",\"svg\",\"4\",{\"ref\":\"$undefined\",\"xmlns\":\"http://www.w3.org/2000/svg\",\"width\":24,\"height\":24,\"viewBox\":\"0 0 24 24\",\"fill\":\"none\",\"stroke\":\"currentColor\",\"strokeWidth\":2,\"strokeLinecap\":\"round\",\"strokeLinejoin\":\"round\",\"className\":\"lucide lucide-star w-5 h-5 fill-current\",\"children\":[[\"$\",\"path\",\"r04s7s\",{\"d\":\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\"}],\"$undefined\"]}]]}],[\"$\",\"blockquote\",null,{\"className\":\"text-xl text-[#333333] font-medium leading-relaxed mb-6\",\"children\":[\"“\",\"PercepVision delivers a scalable, state-of-the-art Al video analytics platform engineered for reliability, performance, and seamless deployment across large-scale environments.\",\"”\"]}],\"$L3b\"]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"30:[\"$\",\"li\",null,{\"children\":[\"$\",\"$L2e\",null,{\"href\":\"/blog\",\"className\":\"hover:text-[#0072FF] transition-colors block\",\"children\":\"Case Studies\"}]}]\n31:[\"$\",\"div\",null,{\"children\":[[\"$\",\"h4\",null,{\"className\":\"font-medium text-[#333333] mb-4 text-sm\",\"children\":\"Company\"}],[\"$\",\"ul\",null,{\"className\":\"space-y-3 text-sm text-[#5c5c5c]\",\"children\":[\"$\",\"li\",null,{\"children\":[\"$\",\"$L2e\",null,{\"href\":\"/contact\",\"className\":\"hover:text-[#0072FF] transition-colors block\",\"children\":\"Contact\"}]}]}]]}]\n32:[\"$\",\"div\",null,{\"children\":[[\"$\",\"h4\",null,{\"className\":\"font-medium text-[#333333] mb-4 text-sm\",\"children\":\"Legal\"}],[\"$\",\"ul\",null,{\"className\":\"space-y-3 text-sm text-[#5c5c5c]\",\"children\":[[\"$\",\"li\",null,{\"children\":[\"$\",\"$L2e\",null,{\"href\":\"/privacy-policy\",\"className\":\"hover:text-[#0072FF] transition-colors block\",\"children\":\"Privacy Policy\"}]}],[\"$\",\"li\",null,{\"children\":[\"$\",\"$L2e\",null,{\"href\":\"/terms-of-use\",\"className\":\"hover:text-[#0072FF] transition-colors block\",\"children\":\"Terms of Use\"}]}]]}]]}]\n33:[\"$\",\"div\",null,{\"className\":\"border-t border-[#cccccc] pt-8 flex flex-col md:flex-row justify-between items-center gap-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"text-sm text-[#5c5c5c]\",\"children\":\"© 2025 Percepvision AI Limited. All rights reserved.\"}],[\"$\",\"div\",null,{\"className\":\"flex items-center gap-2\",\"children\":[[\"$\",\"span\",null,{\"className\":\"w-2 h-2 rounded-full bg-green-500\"}],[\"$\",\"span\",null,{\"className\":\"text-sm text-[#5c5c5c] font-medium\",\"children\":\"All Systems Operational\"}]]}]]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"3b:[\"$\",\"div\",null,{\"className\":\"flex items-center gap-4\",\"children\":[[\"$\",\"div\",null,{\"className\":\"w-12 h-12 bg-[#5c5c5c] rounded-full\"}],[\"$\",\"div\",null,{\"children\":[[\"$\",\"div\",null,{\"className\":\"text-base font-semibold text-[#333333]\",\"children\":\"Robert Yang\"}],[\"$\",\"div\",null,{\"className\":\"text-sm text-[#5c5c5c]\",\"children\":\"PercepVision AI\"}]]}]]}]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"38:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}]]\n"])
+  </script>
+  <script>
+    self.__next_f.push([1,"3c:I[27201,[\"/_next/static/chunks/ff1a16fafef87110.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\",\"/_next/static/chunks/d2be314c3ece3fbe.js?dpl=dpl_Bu3dnPwY6USXfSGFd61x7NTJFiGV\"],\"IconMark\"]\n36:null\n3a:[[\"$\",\"title\",\"0\",{\"children\":\"Percepvision | AI-Powered Smart Safety \u0026 Video Analytics\"}],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"Percepvision transforms your existing IP cameras into an intelligent platform for safety, security, and operational efficiency using advanced AI video analytics.\"}],[\"$\",\"meta\",\"2\",{\"name\":\"generator\",\"content\":\"Next.js\"}],[\"$\",\"meta\",\"3\",{\"name\":\"keywords\",\"content\":\"AI video analytics,smart surveillance,crowd management,security AI,CCTV analytics,occupancy management\"}],[\"$\",\"link\",\"4\",{\"rel\":\"icon\",\"href\":\"/icon-light-32x32.png\",\"media\":\"(prefers-color-scheme: light)\"}],[\"$\",\"link\",\"5\",{\"rel\":\"icon\",\"href\":\"/icon-dark-32x32.png\",\"media\":\"(prefers-color-scheme: dark)\"}],[\"$\",\"link\",\"6\",{\"rel\":\"icon\",\"href\":\"/icon.svg\",\"type\":\"image/svg+xml\"}],[\"$\",\"link\",\"7\",{\"rel\":\"apple-touch-icon\",\"href\":\"/apple-icon.png\"}],[\"$\",\"$L3c\",\"8\",{}]]\n"])
+  </script>
+  <script id="_next-ga-init" data-nscript="afterInteractive">
+    window['dataLayer'] = window['dataLayer'] || [];
+          function gtag(){window['dataLayer'].push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-VVLW38ZKQ8' );
+  </script>
+  <script src="./Privacy Notice _ Percepvision AI_files/js" id="_next-ga" data-nscript="afterInteractive"></script>
+  <next-route-announcer style="position: absolute;"></next-route-announcer>
+  <div hidden=""></div>
+  <div class="flex min-h-screen flex-col bg-white text-[#333333]">
+    <nav class="fixed w-full z-50 top-0 start-0 border-b border-[#e5e5e5] bg-white/80 backdrop-blur-md">
+      <div class="flex flex-wrap max-w-7xl mx-auto py-4 px-6 items-center justify-between">
+        <!-- Logo Section -->
+        <a href="index.html" class="flex items-center gap-3">
+            <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+            <span class="self-center whitespace-nowrap text-2xl font-medium text-gray-900 tracking-tight">Percepvision</span>
+        </a>
+        
+        <!-- Desktop Navigation & CTA -->
+        <div class="hidden md:flex gap-8 gap-x-8 gap-y-8 items-center cursor-pointer" onclick="window.location.href='/#'" role="button">
+            <a href="solutions.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Solutions</a>
+            <a href="blog.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Insights</a>
+            <a href="contact.html" class="inline-flex items-center gap-2.5 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors">
+                <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                Contact Us
+            </a>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <div class="flex md:hidden items-center gap-4">
+            <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none" aria-controls="navbar-sticky" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" class="lucide lucide-menu w-6 h-6" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div class="items-center justify-between hidden w-full md:hidden" id="navbar-sticky">
+            <ul class="flex flex-col p-4 mt-4 font-normal border border-gray-100 rounded-lg bg-gray-50 gap-2">
+                <li>
+                    <a href="index.html" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Solutions</a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Insights</a>
+                </li>
+                <li>
+                    <a href="contact.html" class="inline-flex items-center gap-2 mt-2 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors w-max">
+                        <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                        Contact Us
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </nav>
+    <main class="flex-grow">
+      <header class="border-b border-[#e5e5e5] pt-32 pb-16 md:pt-40 md:pb-20">
+        <div class="mx-auto max-w-4xl px-6">
+          <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-[#0072FF]/20 bg-[#0072FF]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#0072FF]">
+            <span class="h-2 w-2 rounded-full bg-[#0072FF]"></span>Legal</div>
+          <h1 class="mb-6 text-4xl font-semibold leading-tight tracking-tight text-[#333333] md:text-6xl">Privacy Notice
+          </h1>
+          <p class="max-w-3xl text-xl leading-relaxed text-[#5c5c5c]">PercepVision AI Limited is committed to protecting
+            your privacy and handling personal information responsibly.</p>
+          <div class="mt-8 inline-flex rounded-full border border-[#cccccc] bg-[#f5f5f5] px-4 py-2 text-sm font-medium text-[#5c5c5c]">
+            Effective Date: 1 January 2026</div>
+        </div>
+      </header>
+      <article class="mx-auto max-w-4xl px-6 py-16 md:py-20">
+        <div class="space-y-12 text-lg">
+          <section class="pt-0">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Introduction</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">PercepVision AI Limited (“PercepVision”, “we”, “our”, or “us”) is committed to protecting your privacy
+                and handling personal information responsibly.</p>
+              <p class="">This Privacy Notice explains how we collect, use, store and protect personal information when you:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>visit our website;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>contact us;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span class="">request information or a demonstration;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>purchase or use our products or services; or</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>otherwise interact with PercepVision.</span>
+                </li>
+              </ul>
+              <p class="">This Privacy Notice has been prepared in accordance with the UK General Data Protection Regulation (UK
+                GDPR), the Data Protection Act 2018 and other applicable data protection legislation.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Who We Are</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <address class="not-italic leading-relaxed">
+                <p class="font-normal text-[#333333]">PercepVision AI Limited</p>
+                <p>42–44 Clarendon Road</p>
+                <p class="">Watford</p>
+                <p class="">Hertfordshire</p>
+                <p>WD17 1JJ</p>
+                <p class="">United Kingdom</p>
+                <p class="mt-4">Email: <a href="mailto:privacy@percepvision.com" class="font-normal text-[#0072FF] underline-offset-4 hover:underline">privacy@percepvision.com</a>
+                </p>
+              </address>
+              <p class="">If you have any questions regarding this Privacy Notice, please contact us using the details above.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">About XY-Vision</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">PercepVision develops XY-Vision, an AI-powered video analytics platform designed to generate
+                operational and security insights from existing CCTV infrastructure.</p>
+              <p class="">For further information about the privacy architecture of the XY-Vision platform, including Edge AI
+                processing, anonymous analytics, security controls and data flows, please refer to our 'Privacy by
+                Design &amp; Commitment to Data Protection' document.</p>
+              <p class="">XY-Vision has been developed using Privacy by Design principles. During normal operation, live video is
+                analysed locally on an Edge AI device and converted into anonymous, aggregated analytics. Personally
+                identifiable information (PII) is not stored or transmitted by the platform during normal operation. Raw
+                CCTV footage remains under the control of the customer.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Information We Collect
+            </h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">Depending on your interaction with us, we may collect the following information.</p>
+              <h3 class="pt-3 text-lg font-medium text-[#333333]">Information You Provide</h3>
+              <p>This may include:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>your name;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>company name;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>job title;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>business email address;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>telephone number;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>enquiry details;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>information you provide during demonstrations or meetings.</span>
+                </li>
+              </ul>
+              <h3 class="pt-3 text-lg font-medium text-[#333333]">Information Collected Automatically
+              </h3>
+              <p>When you visit our website, we may automatically collect technical information including:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>IP address;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>browser type;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>operating system;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>device information;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>pages visited;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>referring website;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>date and time of access;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>website usage statistics.</span>
+                </li>
+              </ul>
+              <p>This information helps us improve our website and maintain its security.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">How We Use Personal Information</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>We use personal information to:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>respond to enquiries;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>provide demonstrations;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>manage customer relationships;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>deliver products and services;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>improve our website and products;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>provide customer support;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>comply with legal obligations;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span class="">maintain the security of our systems.</span>
+                </li>
+              </ul>
+              <p class="">We do not sell personal information.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Lawful Basis for Processing</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>Under UK GDPR we process personal information using one or more of the following lawful bases:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>your consent;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>performance of a contract;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>compliance with legal obligations;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>our legitimate business interests.</span>
+                </li>
+              </ul>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">CCTV and AI Analytics</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>Customers using XY-Vision remain responsible for operating their CCTV systems and are normally the Data Controller for CCTV footage.</p>
+              <p>Where PercepVision processes information on behalf of customers, we act as a Data Processor in accordance with customer instructions and contractual obligations.</p>
+              <p>XY-Vision has been designed with privacy in mind and includes features such as:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>local Edge AI processing;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>anonymous analytics generation;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>encrypted communications;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>configurable data retention;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>role-based access control;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>multi-factor authentication;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>audit logging.</span>
+                </li>
+              </ul>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Sharing Your Information</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>We may share information with trusted third parties where necessary, including:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>cloud hosting providers;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>IT support providers;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>professional advisers;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>payment providers;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>regulatory authorities where required by law.</span>
+                </li>
+              </ul>
+              <p>All third parties are required to protect personal information appropriately.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">International Transfers</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>Where personal information is transferred outside the United Kingdom, appropriate safeguards will be implemented in accordance with UK GDPR.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Data Retention</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">We retain personal information only for as long as necessary to fulfil the purposes for which it was
+                collected or to meet legal and regulatory obligations.</p>
+              <p class="">Retention periods vary depending on the type of information and applicable legal requirements. Where
+                cloud-hosted analytics are used, anonymous analytics are retained in accordance with customer-configured
+                retention settings (30 days by default). Raw CCTV footage remains under the control of the customer.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Information Security</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">Protecting customer information is fundamental to our business.</p>
+              <p>PercepVision implements technical and organisational measures designed to protect personal information,
+                including where appropriate:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>encrypted communications (HTTPS/TLS);</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>role-based access controls;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>multi-factor authentication (MFA);</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span class="">Single Sign-On (SSO);</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>audit logging;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>secure cloud infrastructure;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>secure on-premises Edge AI processing;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>least-privilege access controls.</span>
+                </li>
+              </ul>
+              <p>While we take reasonable measures to protect personal information, no internet transmission or storage
+                system can be guaranteed to be completely secure.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Cookies</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>Our website uses cookies and similar technologies to:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>ensure website functionality;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>understand website performance;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>improve user experience.</span>
+                </li>
+              </ul>
+              <p>Where required by law, we will obtain your consent before placing non-essential cookies.</p>
+              <p>Further information is available in our Cookie Policy.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Marketing Communications
+            </h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>If you request information from us or become a customer, we may contact you regarding products,
+                services and company updates where permitted by law.</p>
+              <p>You may unsubscribe from marketing communications at any time.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Your Rights</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>Subject to applicable law, you may have the right to:</p>
+              <ul class="my-5 space-y-3">
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span class="">access your personal information;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>correct inaccurate information;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>request deletion;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>restrict processing;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>object to processing;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>request data portability;</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0072FF]"></span><span>withdraw consent where consent has been relied upon.</span>
+                </li>
+              </ul>
+              <p>To exercise any of these rights, please contact us using the details above.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Children’s Privacy</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p>Our website and services are intended for business users and are not directed at children under the age
+                of 16.</p>
+              <p class="">We do not knowingly collect personal information from children.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Changes to this Privacy
+              Notice</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">We may update this Privacy Notice from time to time.</p>
+              <p>Any changes will be published on this page together with the updated effective date.</p>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Contact Us</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">If you have any questions regarding this Privacy Notice or how we process personal information, please
+                contact:</p>
+              <address class="not-italic leading-relaxed">
+                <p class="font-normal text-[#333333]">Privacy Officer</p>
+                <p class="font-normal text-[#333333]">PercepVision AI Limited</p>
+                <p class="">42–44 Clarendon Road</p>
+                <p class="">Watford</p>
+                <p class="">WD17 1JJ</p>
+                <p>United Kingdom</p>
+                <p class="mt-4">Email: <a href="mailto:privacy@percepvision.com" class="font-normal text-[#0072FF] underline-offset-4 hover:underline">privacy@percepvision.com</a>
+                </p>
+              </address>
+            </div>
+          </section>
+          <section class="border-t border-[#e5e5e5] pt-10">
+            <h2 class="mb-5 text-2xl font-medium tracking-tight text-[#333333] md:text-3xl">Complaints</h2>
+            <div class="space-y-5 leading-relaxed text-[#5c5c5c]">
+              <p class="">If you are unhappy with how we have handled your personal information, we encourage you to contact us
+                first so we can attempt to resolve your concerns.</p>
+              <p class="">You also have the right to lodge a complaint with the Information Commissioner’s Office (ICO).</p>
+              <p class="">Information about the ICO is available at: <a href="https://ico.org.uk/" target="_blank" rel="noopener noreferrer" class="font-normal text-[#0072FF] underline-offset-4 hover:underline">https://ico.org.uk/</a></p>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+    <footer class="border-t border-gray-200 pt-16 pb-8 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-16">
+          <div class="col-span-2 md:col-span-4 lg:col-span-2">
+            <a href="#" class="flex items-center space-x-3 mb-6">
+              <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+              <span class="text-xl font-medium text-gray-900 tracking-tight">
+                Percepvision
+              </span>
+            </a>
+            <p class="text-base text-gray-500 max-w-[280px] mb-8 leading-relaxed">
+              Intelligent security solutions for the modern enterprise. Powered
+              by advanced AI, designed for human use.
+            </p>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect width="4" height="12" x="2" y="9"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube">
+                  <path d="M2.5 7.1C2.6 6 3.6 5 4.8 5h14.4c1.2 0 2.2 1 2.3 2.1.1 1.2.1 2.6.1 4.9s0 3.7-.1 4.9c-.1 1.1-1.1 2.1-2.3 2.1H4.8c-1.2 0-2.2-1-2.3-2.1C2.4 15.7 2.4 14.3 2.4 12s0-3.7.1-4.9z"></path>
+                  <path d="M10 15l5-3-5-3v6z"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Product</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="index.html" class="hover:text-gray-900 transition-colors">
+                  Features
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Solutions</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="solutions.html" class="hover:text-gray-900 transition-colors">
+                  Mixed-Use
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Resources</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="blog.html" class="hover:text-gray-900 transition-colors">
+                  Blog
+                </a>
+              </li>
+              <li class="">
+                <a href="blog-post-paddington.html" class="hover:text-gray-900 transition-colors">
+                  Case Studies
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Company</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="contact.html" class="hover:text-gray-900 transition-colors">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Legal</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="#" class="hover:text-gray-900 transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li class="">
+                <a href="terms-of-use.html" class="hover:text-gray-900 transition-colors">
+                  Terms of Use
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="text-base text-gray-500">
+            © 2025 Percepvision AI Limited. All rights reserved.
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-base text-gray-500">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+
+</body></html>

@@ -12,6 +12,9 @@
 /.next/
 /out/
 
+# Aura HTML is the source of truth in /site; public copies are generated at build
+/public/*.html
+
 # production
 /build
 

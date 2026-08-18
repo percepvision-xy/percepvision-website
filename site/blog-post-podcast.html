@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en"><head><script id="aura-preview-performance-controller">
+(function() {
+if (window.__auraPreviewPerformanceController) return;
+const nativeRequestAnimationFrame = window.requestAnimationFrame
+? window.requestAnimationFrame.bind(window)
+: function(callback) { return window.setTimeout(function() { callback(Date.now()); }, 16); };
+const nativeCancelAnimationFrame = window.cancelAnimationFrame
+? window.cancelAnimationFrame.bind(window)
+: window.clearTimeout.bind(window);
+const nativeSetInterval = window.setInterval.bind(window);
+let paused = false;
+let nextFrameId = 1;
+const frameRecords = new Map();
+const pausedFrameCallbacks = new Map();
+const style = document.createElement('style');
+style.id = 'aura-preview-performance-style';
+style.textContent = [
+'html[data-aura-preview-paused="true"] *,',
+'html[data-aura-preview-paused="true"] *::before,',
+'html[data-aura-preview-paused="true"] *::after {',
+'  animation-play-state: paused !important;',
+'  transition-duration: 0s !important;',
+'  scroll-behavior: auto !important;',
+'}'
+].join('\n');
+document.head.appendChild(style);
+window.requestAnimationFrame = function(callback) {
+const frameId = nextFrameId++;
+if (paused) {
+pausedFrameCallbacks.set(frameId, callback);
+frameRecords.set(frameId, { paused: true });
+return frameId;
+}
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+return frameId;
+};
+window.cancelAnimationFrame = function(frameId) {
+const record = frameRecords.get(frameId);
+pausedFrameCallbacks.delete(frameId);
+if (record && typeof record.nativeFrameId !== 'undefined') {
+nativeCancelAnimationFrame(record.nativeFrameId);
+}
+frameRecords.delete(frameId);
+};
+window.setInterval = function(callback, delay) {
+const args = Array.prototype.slice.call(arguments, 2);
+return nativeSetInterval(function() {
+if (paused) return;
+callback.apply(this, args);
+}, delay);
+};
+const flushPausedFrames = function() {
+const callbacks = Array.from(pausedFrameCallbacks.entries());
+pausedFrameCallbacks.clear();
+callbacks.forEach(function(entry) {
+const frameId = entry[0];
+const callback = entry[1];
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+});
+};
+const setPaused = function(nextPaused) {
+const shouldPause = Boolean(nextPaused);
+if (paused === shouldPause) return;
+paused = shouldPause;
+document.documentElement.toggleAttribute('data-aura-preview-paused', paused);
+if (!paused) {
+flushPausedFrames();
+}
+};
+window.__auraPreviewPerformanceController = {
+setPaused: setPaused,
+get paused() {
+return paused;
+}
+};
+window.addEventListener('message', function(event) {
+if (event.source !== window.parent) return;
+if (!event.data || event.data.type !== 'aura-preview-performance-mode') return;
+setPaused(event.data.paused);
+});
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Facilities Podcast E2: Tony Fish on Housing as a Subscription | Aura Blog</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: {
+100: '#0072FF',
+200: '#6aa0ff',
+300: '#e1ffff',
+},
+accent: {
+100: '#4D8BFF',
+200: '#003699',
+},
+neutral: {
+100: '#333333',
+200: '#5c5c5c',
+},
+bg: {
+100: '#FFFFFF',
+200: '#f5f5f5',
+300: '#cccccc',
+}
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+</style>
+<link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style><link id="all-fonts-link-font-newsreader" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&amp;display=swap"><style id="all-fonts-style-font-newsreader">.font-newsreader { font-family: 'Newsreader', serif !important; }</style><link id="all-fonts-link-font-google-sans-flex" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-google-sans-flex">.font-google-sans-flex { font-family: 'Google Sans Flex', sans-serif !important; }</style><link id="all-fonts-link-font-oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-oswald">.font-oswald { font-family: 'Oswald', sans-serif !important; }</style><link id="all-fonts-link-font-dm-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-dm-sans">.font-dm-sans { font-family: 'DM Sans', sans-serif !important; }</style><link id="all-fonts-link-font-cormorant" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-cormorant">.font-cormorant { font-family: 'Cormorant Garamond', serif !important; }</style></head>
+<body class="selection:bg-primary-300 selection:text-primary-100 flex flex-col min-h-screen text-neutral-100">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 start-0 bg-white border-b border-gray-100">
+    <div class="flex flex-wrap max-w-7xl mx-auto py-4 px-6 items-center justify-between">
+        <!-- Logo Section -->
+        <a href="index.html" class="flex items-center gap-3">
+            <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+            <span class="self-center whitespace-nowrap text-2xl font-medium text-gray-900 tracking-tight">Percepvision</span>
+        </a>
+        
+        <!-- Desktop Navigation & CTA -->
+        <div class="hidden md:flex gap-8 gap-x-8 gap-y-8 items-center cursor-pointer" onclick="window.location.href='/#'" role="button">
+            <a href="solutions.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Solutions</a>
+            <a href="blog.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Insights</a>
+            <a href="contact.html" class="inline-flex items-center gap-2.5 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors">
+                <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                Contact Us
+            </a>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <div class="flex md:hidden items-center gap-4">
+            <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none" aria-controls="navbar-sticky" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" class="lucide lucide-menu w-6 h-6" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div class="items-center justify-between hidden w-full md:hidden" id="navbar-sticky">
+            <ul class="flex flex-col p-4 mt-4 font-normal border border-gray-100 rounded-lg bg-gray-50 gap-2">
+                <li>
+                    <a href="index.html" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Solutions</a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Insights</a>
+                </li>
+                <li>
+                    <a href="contact.html" class="inline-flex items-center gap-2 mt-2 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors w-max">
+                        <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                        Contact Us
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <!-- Blog Post Header Section -->
+    <header class="pt-32 pb-16 relative">
+        <div class="max-w-4xl mx-auto px-6">
+            <a href="blog" class="inline-flex items-center hover:text-primary-100 transition-colors group text-sm text-neutral-200 mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-left" class="lucide lucide-arrow-left w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
+                Back to Blog
+            </a>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-primary-100/10 text-primary-100 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Podcast</span>
+                <span class="text-sm text-neutral-200">15 min listen</span>
+            </div>
+
+            <h1 class="md:text-5xl lg:text-6xl leading-tight text-4xl font-semibold text-neutral-100 tracking-tight mb-8">
+                Smart Facilities Podcast E2: Tony Fish on Housing as a Subscription
+            </h1>
+            
+            <p class="leading-relaxed text-xl text-neutral-200 max-w-3xl mb-8">On the latest episode of the Smart Facilities Podcast, we welcomed technologist, investor, and lifelong maker Tony Fish for an expansive conversation that bridged entrepreneurship, housing innovation, and the art of asking better questions. From steam engines in his barn to reengineering housing finance, Tony’s insights offer a lens into how curiosity can fuel real-world change - and why rethinking ownership might be the key to smarter cities.</p>
+
+            <div class="flex items-center gap-4 py-6 border-y border-bg-300 mb-12">
+                <div class="border-bg-300 flex text-sm font-semibold text-neutral-200 bg-white w-12 h-12 border rounded-full items-center justify-center">JH</div>
+                <div class="flex flex-col">
+                    <span class="text-base font-medium text-neutral-100">Jacob Howard</span>
+                    <span class="text-sm text-neutral-200">CMO of Percepvision</span>
+                </div>
+                <div class="flex text-sm text-neutral-200 ml-auto items-center">Jul 30, 2025</div>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl border border-bg-300 bg-neutral-100 group cursor-pointer">
+                <!-- Abstract Podcast Visual -->
+                <div class="absolute inset-0 bg-gradient-to-r from-neutral-100 to-neutral-200">
+                    <div class="absolute inset-0 opacity-20" style="background-image: url('https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/9b0bad33-0bdf-4e72-817e-47610b4f1029_1600w.jpg'); background-size: cover; background-position: center;"></div>
+                </div>
+                
+                <!-- Play Button Overlay -->
+                <div class="absolute top-0 right-0 bottom-0 left-0 w-full h-full z-20 bg-black">
+    <iframe class="w-full h-full" src="https://www.youtube.com/embed/jMiaF46azxM?si=7bY-PxqtshIMtvMx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+</div>
+
+                <div class="absolute bottom-6 left-6 text-white">
+                    <div class="text-sm font-medium uppercase tracking-wider opacity-80 mb-1">Now Playing</div>
+                    <div class="text-lg font-semibold">Episode 2: The Future of Living</div>
+                </div>
+            </div>
+            
+            <!-- Audio Platforms -->
+            <div class="mt-8 flex flex-wrap gap-4 justify-center">
+                <a href="#" class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-bg-200 border border-bg-300 text-neutral-100 hover:border-primary-100 hover:text-primary-100 transition-all font-medium text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones"><path d="M3 14v-3a9 9 0 0 1 18 0v3"></path><path d="M2 19v-3a2 2 0 0 1 2-2h1v8.19A1.81 1.81 0 0 0 5 22h.5"></path><path d="M22 19v-3a2 2 0 0 0-2-2h-1v8.19A1.81 1.81 0 0 1 19 22h-.5"></path><path d="m2 15 2.1-4.2a2 2 0 0 1 1.8-.8h12.2a2 2 0 0 1 1.8.8l2.1 4.2"></path></svg>
+                    Apple Podcasts
+                </a>
+                <a href="#" class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-bg-200 border border-bg-300 text-neutral-100 hover:border-green-500 hover:text-green-600 transition-all font-medium text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-music"><path d="M9 18V5l12-2v13" class=""></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                    Spotify
+                </a>
+                <a href="https://www.youtube.com/watch?v=jMiaF46azxM" class="inline-flex items-center gap-2 border-bg-300 hover:border-red-500 hover:text-red-600 transition-all text-sm font-medium text-neutral-100 border rounded-full pt-3 pr-5 pb-3 pl-5" target="_blank" rel="noopener noreferrer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="youtube" class="lucide lucide-youtube bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white/10 to-white/0" data-icon-set="lucide" data-icon-replaced="true"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg>
+    YouTube
+</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Blog Post Body Section -->
+    <article class="max-w-3xl mr-auto ml-auto pr-6 pb-20 pl-6">
+        <div class="prose prose-lg prose-neutral text-neutral-200 max-w-none">
+            <p class="leading-relaxed text-xl mb-8">
+                In Episode 2 of the Smart Facilities Podcast, we are joined by Tony Fish, a seasoned investor, author, and thought leader in digital identity and governance. Together, we unpack a provocative concept that is reshaping the built environment: <strong class="">Housing as a Subscription</strong>.
+            </p>
+            
+            
+
+            <h2 class="text-3xl font-semibold text-neutral-100 tracking-tight mt-12 mb-6">From Maker Culture to Urban Systems
+
+</h2>
+            <p class="leading-relaxed mb-6">Tony introduced himself humbly, surrounded on the video call by CNC machines, 3D printers, and woodworking tools - a nod to his engineering roots and maker mindset. “I’m an engineer, built into me through my granddad and dad,” he said. That foundation led to a portfolio career spanning finance, tech startups, and the launch of Fab Lab London.
+
+</p><p class="leading-relaxed mb-6">But whether he's prototyping hardware or consulting boards, one thread has remained consistent: building things that matter.</p>
+            
+            
+
+            <h2 class="text-3xl font-semibold text-neutral-100 tracking-tight mt-12 mb-6">Smart Cities, Smart Data, Smarter Decisions
+
+</h2><p class="leading-relaxed mb-6">Tony’s entry into the smart city space came through the Fab Lab network, where he explored the cycle of collecting urban data, making sense of it, and ultimately using it to empower decision-makers. </p><p class="leading-relaxed mb-6">“I can make the sensors… do something with the data… but most of my world is how do you help boards make better decisions,” he explained. His holistic approach focuses on uncovering questions we didn’t realize we needed to ask.</p><figure class="border-primary-100 rounded-xl border-l-4 mt-10 mb-10 pt-8 pr-8 pb-8 pl-8">
+                <blockquote class="leading-relaxed text-xl italic text-neutral-100 mb-4">“Most people assume they know what data is. That leads to bad decisions.” </blockquote>
+                <figcaption class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center text-xs font-bold text-white">TF</div>
+                    <div class="text-sm font-semibold text-neutral-100">Tony Fish</div>
+                </figcaption>
+            </figure>
+            
+            
+
+            <h2 class="text-3xl font-semibold text-neutral-100 tracking-tight mt-12 mb-6">PercepVision AI: Applied Intelligence in Action
+
+</h2>
+            <p class="leading-relaxed mb-6">Tony’s philosophy gels perfectly with that of PercepVision AI, a platform that enhances legacy CCTV systems with real-time AI analytics. Host Jacob Howard emphasized the platform’s problem-first approach: “It’s flipped - the data and the business need come first.”
+
+</p>
+            
+            <p class="leading-relaxed mb-6">Whether it’s tracking overcrowding at visitor attractions, detecting smoke and fire in warehouses, or providing security alerts, PercepVision AI is emblematic of Tony’s ethos: smarter cities emerge when data is gathered purposefully and applied practically.</p><h2 class="text-3xl font-semibold text-neutral-100 tracking-tight mt-12 mb-6">Housing as a Subscription: Rethinking Ownership</h2><p class="leading-relaxed mb-6">Asked about a current project he’s proud of, Tony spotlighted Housing as a Subscription - an alternative to traditional mortgages and rentals. “Mortgages give you security,” he said, “but rental markets are expensive and offer no permanence.”
+
+</p><p class="leading-relaxed mb-6">This new model sits between the two. Residents pay a monthly fee, customize their homes, maintain them, and - if they care for them - get 100% of their money back when they leave. “It’s like a savings account,” Tony explained. Embedded sensors deliver maintenance alerts, while an app guides residents on upkeep - from bleeding radiators to preventing mould.</p><h2 class="text-3xl font-semibold text-neutral-100 tracking-tight mt-12 mb-6">Breaking Financial Myths
+
+</h2><p class="leading-relaxed mb-6">Tony challenged the long-held belief that housing is the best investment, citing data that shows broader market investments often outperform real estate. “If you made three to five times your money on a home, portfolios have made 13–17 times,” he noted. “So I might as well just give you your money back.”
+
+</p><p class="leading-relaxed mb-6">By funneling subscription income into low-cost investments, his model creates an incentive-driven ecosystem where residents care deeply for their homes - and cities grow from within.
+</p><h2 class="text-3xl font-semibold text-neutral-100 tracking-tight mt-12 mb-6">
+Designing for Maintenance &amp; Community
+
+</h2><p class="leading-relaxed mb-6">With years of hands-on handyman experience, Tony advocates for new builds on brownfield sites, emphasizing maintainability over overengineering. “Most homes are built in a way that makes them unmaintainable,” he said.
+
+</p><p class="leading-relaxed mb-6">His vision includes small communities with shared skillsets - plumbers, gardeners, coders, and carpenters - all contributing organically. “We’ve forgotten how to rest upon the neighbours,” he reflected. “Using your skills proudly to help your community - that’s what inspires me.”
+
+</p><h2 class="text-3xl font-semibold text-neutral-100 tracking-tight mt-12 mb-6">The Power of Curiosity</h2><p class="leading-relaxed mb-6">In closing, Tony offered a poetic answer to the final question: What inspires you?</p><p class="leading-relaxed mb-6">“People who are curious,” he said. Not just those who answer questions, but those who “ask better ones.” It’s this mindset - anticipating future problems rather than reacting to today’s - that guides his work across housing, data, and innovation.
+
+</p><p class="leading-relaxed mb-6">“We need more free thinkers like you, Tony,” Jacob said.
+
+</p><p class="leading-relaxed mb-6">“We’re all part of a community,” Tony replied with a smile.</p>
+        </div>
+    </article>
+
+    <!-- Testimonial / Quote Section -->
+    <section class="py-20 bg-neutral-100 text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-100/10 blur-[100px] rounded-full pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-accent-200/20 blur-[80px] rounded-full pointer-events-none"></div>
+        
+        <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" class="w-12 h-12 text-primary-100 mx-auto mb-8 opacity-50"><path d="M11.3 5.4c-1.8 1.5-3.1 3.2-3.8 5.1-.8 1.9-1.2 4-1.2 6.3 0 1 .1 1.9.4 2.8.3.9.7 1.6 1.4 2.2.6.6 1.4 1 2.3 1.1 1 .2 1.9.1 2.9-.2.9-.3 1.8-.8 2.5-1.5.7-.7 1.2-1.6 1.6-2.6.3-1 .5-2.1.5-3.2 0-1.8-.4-3.5-1.2-5.1-.8-1.6-1.9-2.9-3.2-4.1-.4-.3-.8-.7-1.3-.9l-.9.1zm-8.3 0c-1.8 1.5-3.1 3.2-3.8 5.1-.8 1.9-1.2 4-1.2 6.3 0 1 .1 1.9.4 2.8.3.9.7 1.6 1.4 2.2.6.6 1.4 1 2.3 1.1 1 .2 1.9.1 2.9-.2.9-.3 1.8-.8 2.5-1.5.7-.7 1.2-1.6 1.6-2.6.3-1 .5-2.1.5-3.2 0-1.8-.4-3.5-1.2-5.1-.8-1.6-1.9-2.9-3.2-4.1-.4-.3-.8-.7-1.3-.9l-.9.1z"></path></svg>
+            
+            <h3 class="md:text-4xl leading-tight text-2xl font-medium mb-8">“Using your skills proudly to help your community - that’s what inspires me.”</h3>
+            
+            <div class="flex items-center justify-center gap-4">
+                <div class="flex font-bold text-neutral-100 bg-neutral-200 w-12 h-12 rounded-full items-center justify-center">XY</div>
+                <div class="text-left">
+                    <div class="font-semibold text-white">Tony Fish</div>
+                    <div class="text-sm text-neutral-200">Podcast Guest</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section: Related Posts -->
+    <section class="border-bg-300 border-b pt-24 pb-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between mb-12">
+                <h2 class="text-2xl font-semibold tracking-tight text-neutral-100">Read Next</h2>
+                <a href="#" class="text-primary-100 hover:text-accent-200 font-medium text-sm flex items-center transition-colors">View all posts<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4 ml-2" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-x-8 gap-y-8">
+  <!-- Post 1 -->
+  <article class="flex flex-col group h-full">
+    <a href="blog-post-smartfacilities.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200">
+      <div class="absolute inset-0 bg-gradient-to-tr from-bg-200 to-white opacity-50"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/aa7452ad-b197-4982-9c92-5d35df36bfad_800w.jpg" ,="" width="1000" class="">
+      </div>
+    </a>
+    <div class="flex flex-col flex-grow">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-primary-100 text-xs font-semibold uppercase tracking-wide">Podcast</span>
+        <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+        <span class="text-neutral-200 text-xs">Episode 1</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight text-neutral-100 mb-3 group-hover:text-primary-100 transition-colors">
+        <a href="blog-post-smartfacilities.html" class="">Smart Facilities Podcast Premiere: Edge AI with Youssef Nadiri of
+          PNY Technologies</a>
+      </h3>
+    </div>
+  </article>
+
+  <!-- Post 2 -->
+  <article class="flex flex-col group h-full">
+    <a href="blog-post-nvidiaprogram.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200">
+      <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50">
+      </div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/917d6f93-fb36-439a-8c48-884b67b35381_1600w.jpg" class="">
+      </div>
+    </a>
+    <div class="flex flex-col flex-grow">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-primary-100 text-xs font-semibold uppercase tracking-wide">Updates</span>
+        <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+        <span class="text-neutral-200 text-xs">Jun 23, 2025</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight text-neutral-100 mb-3 group-hover:text-primary-100 transition-colors">
+        <a href="blog-post-nvidiaprogram.html" class="">Percepvision AI Joins NVIDIA Inception Program to Accelerate Growth in Smart Surveillance</a>
+      </h3>
+    </div>
+  </article>
+
+  <!-- Post 3 (Reused) -->
+  <article class="flex flex-col group h-full">
+    <a href="blog-post-crowd.html" class="block overflow-hidden rounded-xl border border-bg-300 mb-5 relative aspect-video bg-bg-200">
+      <div class="absolute inset-0 bg-neutral-100"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+<img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/9adf9bae-7f4e-4537-ba28-dd28775359c8_800w.jpg" class="">
+</div>
+    </a>
+    <div class="flex flex-col flex-grow">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-primary-100 text-xs font-semibold uppercase tracking-wide">updates</span>
+        <span class="w-1 h-1 rounded-full bg-neutral-200"></span>
+        <span class="text-neutral-200 text-xs">Sep 25, 2025</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight text-neutral-100 mb-3 group-hover:text-primary-100 transition-colors">
+        <a href="blog-post-crowd.html" class="">Smarter Spaces: How Crowd Management AI Is Reshaping Public Safety and Urban Flow</a>
+      </h3>
+    </div>
+  </article>
+</div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section (CTA Part 2) -->
+    
+
+<!-- Footer -->
+<footer class="border-t border-gray-200 pt-16 pb-8 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-16">
+          <div class="col-span-2 md:col-span-4 lg:col-span-2">
+            <a href="#" class="flex items-center space-x-3 mb-6">
+              <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+              <span class="text-xl font-medium text-gray-900 tracking-tight">
+                Percepvision
+              </span>
+            </a>
+            <p class="text-base text-gray-500 max-w-[280px] mb-8 leading-relaxed">
+              Intelligent security solutions for the modern enterprise. Powered
+              by advanced AI, designed for human use.
+            </p>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect width="4" height="12" x="2" y="9"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube">
+                  <path d="M2.5 7.1C2.6 6 3.6 5 4.8 5h14.4c1.2 0 2.2 1 2.3 2.1.1 1.2.1 2.6.1 4.9s0 3.7-.1 4.9c-.1 1.1-1.1 2.1-2.3 2.1H4.8c-1.2 0-2.2-1-2.3-2.1C2.4 15.7 2.4 14.3 2.4 12s0-3.7.1-4.9z"></path>
+                  <path d="M10 15l5-3-5-3v6z"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Product</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="index.html" class="hover:text-gray-900 transition-colors">
+                  Features
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Solutions</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="solutions.html" class="hover:text-gray-900 transition-colors">Hospitality</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Resources</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="blog.html" class="hover:text-gray-900 transition-colors">
+                  Blog
+                </a>
+              </li>
+              <li class="">
+                <a href="blog-post-paddington.html" class="hover:text-gray-900 transition-colors">
+                  Case Studies
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Company</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="contact.html" class="hover:text-gray-900 transition-colors">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Legal</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="privacy-policy.html" class="hover:text-gray-900 transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li class="">
+                <a href="terms-of-use.html" class="hover:text-gray-900 transition-colors">
+                  Terms of Use
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="text-base text-gray-500">
+            © 2025 Percepvision AI Limited. All rights reserved.
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-base text-gray-500">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script class="">
+        lucide.createIcons({
+            attrs: {
+                'stroke-width': '1.5',
+                'class': 'lucide'
+            }
+        });
+    </script>
+</body></html>

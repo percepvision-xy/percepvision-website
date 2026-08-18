@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en"><head><script id="aura-preview-performance-controller">
+(function() {
+if (window.__auraPreviewPerformanceController) return;
+const nativeRequestAnimationFrame = window.requestAnimationFrame
+? window.requestAnimationFrame.bind(window)
+: function(callback) { return window.setTimeout(function() { callback(Date.now()); }, 16); };
+const nativeCancelAnimationFrame = window.cancelAnimationFrame
+? window.cancelAnimationFrame.bind(window)
+: window.clearTimeout.bind(window);
+const nativeSetInterval = window.setInterval.bind(window);
+let paused = false;
+let nextFrameId = 1;
+const frameRecords = new Map();
+const pausedFrameCallbacks = new Map();
+const style = document.createElement('style');
+style.id = 'aura-preview-performance-style';
+style.textContent = [
+'html[data-aura-preview-paused="true"] *,',
+'html[data-aura-preview-paused="true"] *::before,',
+'html[data-aura-preview-paused="true"] *::after {',
+'  animation-play-state: paused !important;',
+'  transition-duration: 0s !important;',
+'  scroll-behavior: auto !important;',
+'}'
+].join('\n');
+document.head.appendChild(style);
+window.requestAnimationFrame = function(callback) {
+const frameId = nextFrameId++;
+if (paused) {
+pausedFrameCallbacks.set(frameId, callback);
+frameRecords.set(frameId, { paused: true });
+return frameId;
+}
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+return frameId;
+};
+window.cancelAnimationFrame = function(frameId) {
+const record = frameRecords.get(frameId);
+pausedFrameCallbacks.delete(frameId);
+if (record && typeof record.nativeFrameId !== 'undefined') {
+nativeCancelAnimationFrame(record.nativeFrameId);
+}
+frameRecords.delete(frameId);
+};
+window.setInterval = function(callback, delay) {
+const args = Array.prototype.slice.call(arguments, 2);
+return nativeSetInterval(function() {
+if (paused) return;
+callback.apply(this, args);
+}, delay);
+};
+const flushPausedFrames = function() {
+const callbacks = Array.from(pausedFrameCallbacks.entries());
+pausedFrameCallbacks.clear();
+callbacks.forEach(function(entry) {
+const frameId = entry[0];
+const callback = entry[1];
+const nativeFrameId = nativeRequestAnimationFrame(function(timestamp) {
+frameRecords.delete(frameId);
+callback(timestamp);
+});
+frameRecords.set(frameId, { nativeFrameId: nativeFrameId });
+});
+};
+const setPaused = function(nextPaused) {
+const shouldPause = Boolean(nextPaused);
+if (paused === shouldPause) return;
+paused = shouldPause;
+document.documentElement.toggleAttribute('data-aura-preview-paused', paused);
+if (!paused) {
+flushPausedFrames();
+}
+};
+window.__auraPreviewPerformanceController = {
+setPaused: setPaused,
+get paused() {
+return paused;
+}
+};
+window.addEventListener('message', function(event) {
+if (event.source !== window.parent) return;
+if (!event.data || event.data.type !== 'aura-preview-performance-mode') return;
+setPaused(event.data.paused);
+});
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura Security | Solutions</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: {
+100: '#0072FF',
+200: '#6aa0ff',
+300: '#e1ffff',
+},
+accent: {
+100: '#4D8BFF',
+200: '#003699',
+},
+neutral: {
+100: '#111111',
+200: '#5c5c5c',
+300: '#9ca3af',
+},
+bg: {
+100: '#FFFFFF',
+200: '#f5f5f5',
+300: '#e5e5e5',
+}
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+</style></head>
+<body class="bg-bg-100 text-neutral-100 selection:bg-primary-300 selection:text-primary-100">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 start-0 bg-white border-b border-gray-100">
+    <div class="flex flex-wrap max-w-7xl mx-auto py-4 px-6 items-center justify-between">
+        <!-- Logo Section -->
+        <a href="index.html" class="flex items-center gap-3">
+            <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+            <span class="self-center whitespace-nowrap text-2xl font-medium text-gray-900 tracking-tight">Percepvision</span>
+        </a>
+        
+        <!-- Desktop Navigation & CTA -->
+        <div class="hidden md:flex gap-8 gap-x-8 gap-y-8 items-center cursor-pointer" onclick="window.location.href='/#'" role="button">
+            <a href="solutions.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Solutions</a>
+            <a href="blog.html" class="text-lg font-normal text-gray-900 hover:text-[#0066FF] transition-colors">Insights</a>
+            <a href="contact.html" class="inline-flex items-center gap-2.5 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors">
+                <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                Contact Us
+            </a>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <div class="flex md:hidden items-center gap-4">
+            <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none" aria-controls="navbar-sticky" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" aria-hidden="true" class="lucide lucide-menu w-6 h-6"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div class="items-center justify-between hidden w-full md:hidden" id="navbar-sticky">
+            <ul class="flex flex-col p-4 mt-4 font-normal border border-gray-100 rounded-lg bg-gray-50 gap-2">
+                <li>
+                    <a href="index.html" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Solutions</a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100">Insights</a>
+                </li>
+                <li>
+                    <a href="contact.html" class="inline-flex items-center gap-2 mt-2 px-6 py-2.5 bg-[#0066FF] text-white text-base font-normal rounded-full hover:bg-blue-600 transition-colors w-max">
+                        <span class="w-2 h-2 rounded-full bg-[#00FF9D]"></span>
+                        Contact Us
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <!-- Main Solutions Content -->
+    <main class="min-h-screen pt-32 pb-24">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <div class="grid lg:grid-cols-2 gap-16 gap-x-16 gap-y-16 items-start">
+                
+                <!-- Left Content Column -->
+                <div class="col-span-full flex flex-col w-full gap-x-20 gap-y-20">
+    <!-- Top Section (Hero) -->
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 gap-x-12 gap-y-12 items-center">
+        <!-- Left Text -->
+        <div class="space-y-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-bg-200 border border-bg-300">
+                <span class="w-2 h-2 rounded-full bg-[#00E599]"></span>
+                <span class="text-sm font-medium text-neutral-100">Solutions</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-[3.5rem] font-semibold tracking-tight text-neutral-100 leading-[1.15]">
+                Visual Intelligence for Complex, High-Traffic Environments
+            </h1>
+            
+            <p class="text-xl md:text-2xl font-medium text-primary-100 leading-snug">
+                Improve safety, strengthen security and gain greater operational visibility across complex physical environments.
+            </p>
+        </div>
+
+        <!-- Right Image -->
+        <div class="relative w-full aspect-[4/3] md:aspect-auto md:h-[500px] rounded-[1.5rem] overflow-hidden shadow-2xl">
+            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="Paddington Square Skyscrapers" class="w-full h-full object-cover">
+            
+            <!-- Floating Badge -->
+            <div class="absolute bottom-6 left-6 md:bottom-8 md:left-8 bg-[#111111]/90 backdrop-blur-md px-4 py-3 rounded-xl flex items-center gap-3 border border-white/10">
+                <div class="bg-white/10 p-1.5 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="factory" aria-hidden="true" class="lucide lucide-factory w-4 h-4 text-white"><path d="M12 16h.01"></path><path d="M16 16h.01"></path><path d="M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"></path><path d="M8 16h.01"></path></svg>
+                </div>
+                <span class="text-xs font-medium text-white tracking-wide">Industrial Analytics Active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redesigned Operational Intelligence Section -->
+    <div class="md:p-12 lg:p-16 flex flex-col bg-white w-full rounded-[2.5rem] pt-8 pr-8 pb-8 pl-8 shadow-sm gap-x-y-16 gap-y-16">
+        <!-- Header -->
+        <div class="w-full max-w-4xl mx-auto text-center space-y-6">
+            <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900 leading-tight">
+                Operational Intelligence <span class="text-blue-500">in Action</span>
+            </h2>
+            <p class="text-xl md:text-2xl text-neutral-700 font-normal leading-relaxed">
+                See how organisations are using PercepVision to transform existing camera infrastructure into actionable insights that improve safety, security and operational performance.
+            </p>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="grid lg:grid-cols-[1.1fr_1fr] xl:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16">
+            <!-- Left Image -->
+            <div class="w-full rounded-[1.5rem] overflow-hidden shadow-lg border border-neutral-100 h-full min-h-[400px]">
+                <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/759bf5cb-c30d-4df2-b004-ea26e464f5c5_1600w.png" alt="Paddington Square Skyscrapers" class="w-full h-full object-cover">
+            </div>
+
+            <!-- Right Content -->
+            <div class="flex flex-col justify-center gap-y-12 py-4">
+                <!-- Quote Box -->
+                <div class="border-l-[4px] border-blue-200 pl-6 flex flex-col items-start space-y-6">
+                    <p class="text-xl md:text-2xl text-neutral-600 font-normal leading-relaxed">
+                        <span class="font-semibold text-neutral-900">Paddington Square</span> demonstrates how AI-powered video analytics can transform a complex, transport-connected development into a safer, more efficient, and more commercially optimized environment.
+                    </p>
+                    <a href="blog-post-paddington.html" class="inline-flex items-center text-blue-500 text-lg font-medium hover:text-blue-600 transition-colors group">
+                        Read Article
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </a>
+                </div>
+
+                <!-- 2 Columns: Challenges / Solutions -->
+                <div class="grid sm:grid-cols-2 gap-10">
+                    <!-- Challenges -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle w-5 h-5 text-neutral-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+                            <span class="text-sm font-semibold text-neutral-400 tracking-wider uppercase">Challenges</span>
+                        </div>
+                        <ul class="space-y-5">
+                            <li class="flex items-start gap-4 text-neutral-500 text-base font-normal leading-relaxed">
+                                <div class="w-1.5 h-1.5 rounded-full bg-neutral-300 mt-2.5 shrink-0"></div>
+                                <span class="">High crowd volumes driven by rail and underground connectivity</span>
+                            </li>
+                            <li class="flex items-start gap-4 text-neutral-500 text-base font-normal leading-relaxed">
+                                <div class="w-1.5 h-1.5 rounded-full bg-neutral-300 mt-2.5 shrink-0"></div>
+                                <span class="">Peak-time congestion across escalators, lifts, and ticket halls</span>
+                            </li>
+                            <li class="flex items-start gap-4 text-neutral-500 text-base font-normal leading-relaxed">
+                                <div class="w-1.5 h-1.5 rounded-full bg-neutral-300 mt-2.5 shrink-0"></div>
+                                <span class="">After-hours security risks and unauthorized access</span>
+                            </li>
+                            <li class="flex items-start gap-4 text-neutral-500 text-base font-normal leading-relaxed">
+                                <div class="w-1.5 h-1.5 rounded-full bg-neutral-300 mt-2.5 shrink-0"></div>
+                                <span class="">Limited visibility into underutilized circulation and retail zones</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- How Percepvision Helps -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle-2 w-5 h-5 text-blue-500"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+                            <span class="text-sm font-semibold text-blue-500 tracking-wider uppercase">How Percepvision Helps</span>
+                        </div>
+                        <ul class="space-y-5">
+                            <li class="flex items-start gap-3 text-neutral-900 text-base font-medium leading-relaxed">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle w-6 h-6 text-green-500 shrink-0 mt-0.5"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>
+                                <span>Crowd flow &amp; footfall analytics across escalators and lifts</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-neutral-900 text-base font-medium leading-relaxed">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle w-6 h-6 text-green-500 shrink-0 mt-0.5"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>
+                                <span>Zone-level occupancy intelligence to identify high/low-value areas</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-neutral-900 text-base font-medium leading-relaxed">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle w-6 h-6 text-green-500 shrink-0 mt-0.5"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>
+                                <span>Real-time alerts for intrusion, loitering, and unattended objects</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-neutral-900 text-base font-medium leading-relaxed">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle w-6 h-6 text-green-500 shrink-0 mt-0.5"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>
+                                <span>Actionable insights to optimize tenant placement and staffing</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Outcomes Box -->
+        <div class="w-full bg-neutral-50 border border-neutral-200 rounded-[1.5rem] p-8 md:p-10">
+            <div class="flex items-center gap-3 mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award w-6 h-6 text-amber-500"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path></svg>
+                <span class="text-sm font-semibold text-neutral-900 tracking-wider uppercase">Key Outcomes</span>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="flex items-start gap-4">
+                    <div class="w-1.5 h-1.5 bg-blue-500 mt-2.5 shrink-0 rounded-sm"></div>
+                    <span class="text-base font-medium text-neutral-900 leading-snug">Differentiation of commuter vs. retail traffic</span>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-1.5 h-1.5 bg-blue-500 mt-2.5 shrink-0 rounded-sm"></div>
+                    <span class="text-base font-medium text-neutral-900 leading-snug">Identification of high-value circulation zones</span>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-1.5 h-1.5 bg-blue-500 mt-2.5 shrink-0 rounded-sm"></div>
+                    <span class="text-base font-medium text-neutral-900 leading-snug">Early risk detection with reduced false alarms</span>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-1.5 h-1.5 bg-blue-500 mt-2.5 shrink-0 rounded-sm"></div>
+                    <span class="text-base font-medium text-neutral-900 leading-snug">Activation of underperforming spatial areas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                <!-- Right Image Column -->
+                
+            </div>
+
+            <!-- Features List Section -->
+            <div class="mt-40 mb-32 bg-white py-20 px-6 md:px-12 rounded-[2rem]">
+    <div class="text-center max-w-4xl mx-auto mb-16">
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900 mb-6">
+            Solutions for <span class="text-blue-600">Complex Environments</span>
+        </h2>
+        <p class="text-lg md:text-xl text-neutral-600 leading-relaxed max-w-3xl mx-auto">
+            PercepVision applies AI-powered visual intelligence to the specific safety, security and operational challenges of each environment.
+        </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <!-- Card 1 -->
+        <div class="p-8 rounded-[1.5rem] border border-neutral-200 bg-white hover:shadow-sm transition-all duration-300">
+            <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8 text-emerald-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                    <path d="M21 3l-6 6"></path><path d="M21 3v5"></path><path d="M21 3h-5"></path>
+                    <path d="M3 21l6-6"></path><path d="M3 21v-5"></path><path d="M3 21h-5"></path>
+                    <path d="M21 21l-6-6"></path><path d="M21 21v-5"></path><path d="M21 21h-5"></path>
+                    <path d="M3 3l6 6"></path><path d="M3 3v5"></path><path d="M3 3h5"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-neutral-900 mb-4 tracking-tight leading-snug">Construction and Large Commercial Buildings</h3>
+            <p class="text-lg text-neutral-600 leading-relaxed">
+                Improve site safety, occupancy visibility, compliance and building management.
+            </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="p-8 rounded-[1.5rem] border border-neutral-200 bg-white hover:shadow-sm transition-all duration-300">
+            <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8 text-emerald-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 12 12 17 22 12"></polyline><polyline points="2 17 12 22 22 17"></polyline>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-neutral-900 mb-4 tracking-tight leading-snug">Stadiums and Event Venues</h3>
+            <p class="text-lg text-neutral-600 leading-relaxed">
+                Monitor crowd density, queues and visitor movement to support safer, more efficient events.
+            </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="p-8 rounded-[1.5rem] border border-neutral-200 bg-white hover:shadow-sm transition-all duration-300">
+            <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8 text-emerald-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-neutral-900 mb-4 tracking-tight leading-snug">Transport Hubs</h3>
+            <p class="text-lg text-neutral-600 leading-relaxed">
+                Identify congestion, monitor occupancy and improve passenger safety with real-time visibility.
+            </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="p-8 rounded-[1.5rem] border border-neutral-200 bg-white hover:shadow-sm transition-all duration-300">
+            <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8 text-emerald-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-neutral-900 mb-4 tracking-tight leading-snug">Public spaces, museums &amp; visitor attractions</h3>
+            <p class="text-lg text-neutral-600 leading-relaxed">
+                Understand visitor flow, manage capacity and protect people, exhibits and restricted areas.
+            </p>
+        </div>
+    </div>
+</div>
+
+            <!-- Feature Section (AI Tech) -->
+            <div class="mb-32 rounded-3xl bg-neutral-100 overflow-hidden relative isolate">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+                
+            </div>
+
+            <!-- Services Section -->
+            <div class="mb-32">
+    <div class="text-center max-w-4xl mx-auto mb-16">
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900 mb-4">
+            Supported from <span class="text-blue-600">Deployment to Decision-Making</span>
+        </h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-12 lg:gap-16 px-4 md:px-0">
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-blue-700 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye w-7 h-7"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight text-neutral-900 mb-3">Seamless Installation</h3>
+            <p class="text-lg text-neutral-600 leading-relaxed">Expert deployment with minimal disruption to your daily operations, fully integrated with existing hardware.</p>
+        </div>
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-blue-700 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library w-7 h-7"><path d="m16 6 4 14" class=""></path><path d="M12 6v14" class=""></path><path d="M8 8v12"></path><path d="M4 4v16"></path></svg>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight text-neutral-900 mb-3">24/7 Ongoing Monitoring</h3>
+            <p class="text-lg text-neutral-600 leading-relaxed">Continuous system health checks and alert escalation designed to support platform availability.</p>
+        </div>
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-blue-700 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rocket w-7 h-7"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+            </div>
+            <h3 class="text-xl font-medium tracking-tight text-neutral-900 mb-3">Analytics Reporting</h3>
+            <p class="text-lg text-neutral-600 leading-relaxed">Weekly executive summaries and granular data access to drive operational improvements.</p>
+        </div>
+    </div>
+</div>
+
+            <!-- FAQ Section -->
+            <div class="mb-32 max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-semibold tracking-tight text-neutral-100 mb-12 text-center">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group border-b border-bg-300 pb-4">
+                        <summary class="flex justify-between items-center cursor-pointer list-none py-2">
+                            <span class="text-xl font-medium text-neutral-100">Does Percepvision integrate with existing CCTV cameras?</span>
+                            <span class="transition group-open:rotate-180">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-down" aria-hidden="true" class="lucide lucide-chevron-down w-5 h-5 text-neutral-300"><path d="m6 9 6 6 6-6"></path></svg>
+                            </span>
+                        </summary>
+                        <div class="text-neutral-200 mt-3 text-lg leading-relaxed group-open:animate-in group-open:slide-in-from-top-2 duration-200">
+                            Yes. Our solution is hardware-agnostic and designed to overlay onto your existing IP camera infrastructure, reducing the need for costly hardware replacements.
+                        </div>
+                    </details>
+                    <details class="group border-b border-bg-300 pb-4 pt-4">
+                        <summary class="flex justify-between items-center cursor-pointer list-none py-2">
+                            <span class="text-xl font-medium text-neutral-100">Is facial recognition data stored securely?</span>
+                            <span class="transition group-open:rotate-180">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-down" aria-hidden="true" class="lucide lucide-chevron-down w-5 h-5 text-neutral-300"><path d="m6 9 6 6 6-6"></path></svg>
+                            </span>
+                        </summary>
+                        <div class="text-neutral-200 mt-3 text-lg leading-relaxed group-open:animate-in group-open:slide-in-from-top-2 duration-200">
+                            Absolutely. We employ enterprise-grade encryption for all data at rest and in transit. We are fully GDPR and CCPA compliant, ensuring biometric data is handled with the strictest privacy protocols.
+                        </div>
+                    </details>
+                    <details class="group border-b border-bg-300 pb-4 pt-4">
+                        <summary class="flex justify-between items-center cursor-pointer list-none py-2">
+                            <span class="text-xl font-medium text-neutral-100">What is the typical deployment timeline?</span>
+                            <span class="transition group-open:rotate-180">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-down" aria-hidden="true" class="lucide lucide-chevron-down w-5 h-5 text-neutral-300"><path d="m6 9 6 6 6-6"></path></svg>
+                            </span>
+                        </summary>
+                        <div class="text-neutral-200 mt-3 text-lg leading-relaxed group-open:animate-in group-open:slide-in-from-top-2 duration-200">
+                            For most corporate and retail environments, our software-first deployment can be active within 48-72 hours. Full custom model training for complex industrial sites typically takes 2-3 weeks.
+                        </div>
+                    </details>
+                    <details class="group border-b border-bg-300 pb-4 pt-4">
+                        <summary class="flex justify-between items-center cursor-pointer list-none py-2">
+                            <span class="text-xl font-medium text-neutral-100">Do you offer 24/7 technical support?</span>
+                            <span class="transition group-open:rotate-180">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-down" aria-hidden="true" class="lucide lucide-chevron-down w-5 h-5 text-neutral-300"><path d="m6 9 6 6 6-6"></path></svg>
+                            </span>
+                        </summary>
+                        <div class="text-neutral-200 mt-3 text-lg leading-relaxed group-open:animate-in group-open:slide-in-from-top-2 duration-200">
+                            Yes, our Enterprise tier includes dedicated 24/7 support, while our Business tier offers extended business hours support with emergency escalation protocols.
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            
+
+        </div>
+    </main><section class="py-24 bg-bg-200">
+    <div class="max-w-4xl mx-auto px-6 flex flex-col items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-100 mb-6">
+            See What Your Existing Cameras<br>
+            Could Tell You
+        </h2>
+        <p class="text-lg md:text-xl text-neutral-200 mb-10 max-w-2xl leading-relaxed">
+            Request a tailored demonstration based on your<br class="hidden md:block">
+            environment, infrastructure and operational priorities.
+        </p>
+        <a href="contact.html" class="inline-flex items-center gap-2.5 px-8 py-3.5 bg-primary-100 text-white text-base font-medium rounded-full hover:bg-accent-200 transition-colors">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#00DF81]"></span>
+            Request a Demo
+        </a>
+    </div>
+</section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 pt-16 pb-8 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-16">
+          <div class="col-span-2 md:col-span-4 lg:col-span-2">
+            <a href="#" class="flex items-center space-x-3 mb-6">
+              <img class="flex w-9 h-9 rounded-full items-center justify-center" src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/ec64ebf2-6582-47b5-8227-1e0828968767_320w.png" alt="">
+              <span class="text-xl font-medium text-gray-900 tracking-tight">
+                Percepvision
+              </span>
+            </a>
+            <p class="text-base text-gray-500 max-w-[280px] mb-8 leading-relaxed">
+              Intelligent security solutions for the modern enterprise. Powered
+              by advanced AI, designed for human use.
+            </p>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect width="4" height="12" x="2" y="9"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube">
+                  <path d="M2.5 7.1C2.6 6 3.6 5 4.8 5h14.4c1.2 0 2.2 1 2.3 2.1.1 1.2.1 2.6.1 4.9s0 3.7-.1 4.9c-.1 1.1-1.1 2.1-2.3 2.1H4.8c-1.2 0-2.2-1-2.3-2.1C2.4 15.7 2.4 14.3 2.4 12s0-3.7.1-4.9z"></path>
+                  <path d="M10 15l5-3-5-3v6z"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Product</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="index.html" class="hover:text-gray-900 transition-colors">
+                  Features
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Solutions</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="solutions.html" class="hover:text-gray-900 transition-colors">Hospitality</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Resources</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="blog.html" class="hover:text-gray-900 transition-colors">
+                  Blog
+                </a>
+              </li>
+              <li class="">
+                <a href="blog-post-paddington.html" class="hover:text-gray-900 transition-colors">
+                  Case Studies
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Company</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="contact.html" class="hover:text-gray-900 transition-colors">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="">
+            <h4 class="font-medium text-gray-900 mb-5 text-base">Legal</h4>
+            <ul class="space-y-3.5 text-base text-gray-500">
+              <li class="">
+                <a href="privacy-policy.html" class="hover:text-gray-900 transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li class="">
+                <a href="terms-of-use.html" class="hover:text-gray-900 transition-colors">
+                  Terms of Use
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="text-base text-gray-500">
+            © 2025 Percepvision AI Limited. All rights reserved.
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-base text-gray-500">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+        lucide.createIcons({
+            attrs: {
+                'stroke-width': '1.5'
+            }
+        });
+    </script>
+
+</body></html>
