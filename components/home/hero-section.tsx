@@ -16,7 +16,7 @@ export function HeroSection() {
       <div className="z-10 text-center max-w-7xl mx-auto px-6 relative">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f5f5] border border-[#cccccc] text-xs font-medium text-[#5c5c5c] mb-8">
           <span className="w-2 h-2 rounded-full bg-[#0072FF] animate-pulse" />
-          v2.0 Model Live Now
+          v2.0 Model Live
         </div>
         <h1 className="md:text-7xl leading-tight text-5xl font-semibold text-[#333333] tracking-tight max-w-4xl mx-auto mb-6">
           AI-Powered Smart Safety <br />
