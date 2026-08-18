@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="border-[#cccccc] border-t pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-16">
           {/* Brand Section */}
           <div className="col-span-2 md:col-span-4 lg:col-span-2 flex flex-col pr-4 items-start">
             <Link href="/" className="flex items-center gap-2.5 mb-5 group">
@@ -21,7 +21,7 @@ export function Footer() {
                 Percepvision
               </span>
             </Link>
-            <p className="leading-relaxed text-sm font-light text-[#5c5c5c] max-w-sm mb-6">
+            <p className="leading-relaxed text-base text-[#5c5c5c] max-w-[280px] mb-8">
               Intelligent security solutions for the modern enterprise. Powered by advanced AI, designed for human use.
             </p>
             <div className="flex gap-4 items-center">
@@ -59,8 +59,8 @@ export function Footer() {
 
           {/* Product */}
           <div>
-            <h4 className="font-medium text-[#333333] mb-4 text-sm">Product</h4>
-            <ul className="text-sm text-[#5c5c5c] space-y-3">
+            <h4 className="font-medium text-[#333333] mb-5 text-base">Product</h4>
+            <ul className="text-base text-[#5c5c5c] space-y-3.5">
               <li>
                 <Link href="/" className="hover:text-[#0072FF] transition-colors block">
                   Features
@@ -74,11 +74,11 @@ export function Footer() {
 
           {/* Solutions */}
           <div>
-            <h4 className="font-medium text-[#333333] mb-4 text-sm">Solutions</h4>
-            <ul className="space-y-3 text-sm text-[#5c5c5c]">
+            <h4 className="font-medium text-[#333333] mb-5 text-base">Solutions</h4>
+            <ul className="space-y-3.5 text-base text-[#5c5c5c]">
               <li>
                 <Link href="/solutions" className="hover:text-[#0072FF] transition-colors block">
-                  Mixed-Use
+                  Hospitality
                 </Link>
               </li>
               {/* <li>
@@ -95,8 +95,8 @@ export function Footer() {
 
           {/* Blog */}
           <div>
-            <h4 className="font-medium text-[#333333] mb-4 text-sm">Resources</h4>
-            <ul className="space-y-3 text-sm text-[#5c5c5c]">
+            <h4 className="font-medium text-[#333333] mb-5 text-base">Resources</h4>
+            <ul className="space-y-3.5 text-base text-[#5c5c5c]">
               <li>
                 <Link href="/blog" className="hover:text-[#0072FF] transition-colors block">
                   Blog
@@ -112,8 +112,8 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-medium text-[#333333] mb-4 text-sm">Company</h4>
-            <ul className="space-y-3 text-sm text-[#5c5c5c]">
+            <h4 className="font-medium text-[#333333] mb-5 text-base">Company</h4>
+            <ul className="space-y-3.5 text-base text-[#5c5c5c]">
               {/* <li>
                 <span className="text-[#5c5c5c]/50 cursor-not-allowed block">About Us</span>
               </li>
@@ -130,8 +130,8 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="font-medium text-[#333333] mb-4 text-sm">Legal</h4>
-            <ul className="space-y-3 text-sm text-[#5c5c5c]">
+            <h4 className="font-medium text-[#333333] mb-5 text-base">Legal</h4>
+            <ul className="space-y-3.5 text-base text-[#5c5c5c]">
               <li>
                 <Link href="/privacy-policy" className="hover:text-[#0072FF] transition-colors block">
                   Privacy Policy
@@ -147,10 +147,10 @@ export function Footer() {
         </div>
 
         <div className="border-t border-[#cccccc] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-sm text-[#5c5c5c]">© 2025 Percepvision AI Limited. All rights reserved.</div>
+          <div className="text-base text-[#5c5c5c]">© 2025 Percepvision AI Limited. All rights reserved.</div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="text-sm text-[#5c5c5c] font-medium">All Systems Operational</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-base text-[#5c5c5c]">All Systems Operational</span>
           </div>
         </div>
       </div>

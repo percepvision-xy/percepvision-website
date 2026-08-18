@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link"
-import { ArrowRight, PlayCircle } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { sendGAEvent } from "@next/third-parties/google";
 
 export function HeroSection() {
@@ -16,16 +16,16 @@ export function HeroSection() {
       <div className="z-10 text-center max-w-7xl mx-auto px-6 relative">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f5f5] border border-[#cccccc] text-xs font-medium text-[#5c5c5c] mb-8">
           <span className="w-2 h-2 rounded-full bg-[#0072FF] animate-pulse" />
-          v2.0 Model Live
+          Enterprise AI-Powered Visual Intelligence
         </div>
         <h1 className="md:text-7xl leading-tight text-5xl font-semibold text-[#333333] tracking-tight max-w-4xl mx-auto mb-6">
-          AI-Powered Smart Safety <br />
+          Turn Existing Cameras into <br />
           <span className="bg-clip-text text-transparent bg-linear-to-r from-[#0072FF] to-[#003699]">
-            & Video Analytics
+            Operational Intelligence
           </span>
         </h1>
         <p className="leading-relaxed text-xl font-normal text-[#5c5c5c] max-w-2xl mx-auto mb-10">
-          Percepvision is a scalable AI solution that transforms your existing IP cameras into an intelligent platform for safety, security, and operational efficiency.
+          PercepVision transforms existing camera infrastructure into real-time insights that help organisations improve safety, security and operational efficiency.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
@@ -38,9 +38,6 @@ export function HeroSection() {
           >
             Request Demo <ArrowRight className="w-4 h-4" />
           </Link>
-          <span className="sm:w-auto border-[#cccccc] cursor-not-allowed opacity-50 flex items-center justify-center gap-2 font-medium text-[#333333] bg-white w-full border rounded-full py-4 px-8">
-            <PlayCircle className="w-4 h-4" /> Watch Video
-          </span>
         </div>
 
         {/* UI Mockup - Video */}
